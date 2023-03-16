@@ -10,6 +10,8 @@
 		<PackageId>uSync.Migrations</PackageId>
 		<Title>uSync Migrations</Title>
 		<Description>Migration tool for Umbraco Runs on 10+ migrates from 7</Description>
+		<AssemblyVersion>4.0.0.0</AssemblyVersion>
+		<FileVersion>4.0.0.0</FileVersion>
 	</PropertyGroup>	
 	
 	<ItemGroup>
