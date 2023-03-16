@@ -14,86 +14,79 @@ namespace uSync.Migrations.Migrators.BlockGrid.Config;
 ///  
 ///  i think in a perfect world we will be able to refactor this context out of existantce. 
 /// </remarks>
-internal class GridToBlockGridConfigContext
-{
-    public GridConfiguration GridConfiguration { get; }
-    public IGridConfig GridConfig { get; }
-    public int? GridColumns { get; }
+internal class GridToBlockGridConfigContext {
+  public GridConfiguration GridConfiguration { get; }
+  public IGridConfig GridConfig { get; }
+  public int? GridColumns { get; }
 
-    public List<BlockGridConfiguration.BlockGridGroupConfiguration> BlockGroups { get; } = new();
-    public Dictionary<string, BlockGridConfiguration.BlockGridBlockConfiguration> LayoutBlocks { get; } = new();
-    public List<BlockGridConfiguration.BlockGridBlockConfiguration> ContentBlocks { get; } = new();
+  public List<BlockGridConfiguration.BlockGridGroupConfiguration> BlockGroups { get; } = new();
+  public Dictionary<string, BlockGridConfiguration.BlockGridBlockConfiguration> LayoutBlocks { get; } = new();
+  public List<BlockGridConfiguration.BlockGridBlockConfiguration> ContentBlocks { get; } = new();
 
-    public BlockGridConfiguration.BlockGridAreaConfiguration RootArea { get; } = new();
-    public Dictionary<BlockGridConfiguration.BlockGridAreaConfiguration, IEnumerable<string>> AllowedEditors { get; } = new();
-    public Dictionary<BlockGridConfiguration.BlockGridAreaConfiguration, IEnumerable<string>> AllowedLayouts { get; } = new();
+  public BlockGridConfiguration.BlockGridAreaConfiguration RootArea { get; } = new();
+  public Dictionary<BlockGridConfiguration.BlockGridAreaConfiguration, IEnumerable<string>> AllowedEditors { get; } = new();
+  public Dictionary<BlockGridConfiguration.BlockGridAreaConfiguration, IEnumerable<string>> AllowedLayouts { get; } = new();
 
-	public BlockGridConfiguration.BlockGridGroupConfiguration LayoutsGroup { get; } = new()
-	{
-		Key = $"group_{nameof(LayoutsGroup)}".ToGuid(),
-		Name = "Layouts"
-	};
-	public BlockGridConfiguration.BlockGridGroupConfiguration GridBlocksGroup { get; } = new()
-	{
-		Key = $"group_{nameof(GridBlocksGroup)}".ToGuid(),
-		Name = "Grid Blocks"
-	};
+  public BlockGridConfiguration.BlockGridGroupConfiguration LayoutsGroup { get; } = new() {
+    Key = $"group_{nameof( LayoutsGroup )}".ToGuid(),
+    Name = "Layouts"
+  };
+  public BlockGridConfiguration.BlockGridGroupConfiguration GridBlocksGroup { get; } = new() {
+    Key = $"group_{nameof( GridBlocksGroup )}".ToGuid(),
+    Name = "Grid Blocks"
+  };
 
 
-	public GridToBlockGridConfigContext(GridConfiguration gridConfiguration, IGridConfig gridConfig)
-    {
-        GridConfig = gridConfig;
-        GridConfiguration = gridConfiguration;
-        GridColumns = gridConfiguration.GetGridColumns();
+  public GridToBlockGridConfigContext( GridConfiguration gridConfiguration, IGridConfig gridConfig ) {
+    GridConfig = gridConfig;
+    GridConfiguration = gridConfiguration;
+    GridColumns = gridConfiguration.GetGridColumns();
 
-        BlockGroups.Add(LayoutsGroup);
-        BlockGroups.Add(GridBlocksGroup);
-    }
+    BlockGroups.Add( LayoutsGroup );
+    BlockGroups.Add( GridBlocksGroup );
+  }
 
-    public IEnumerable<string> GetAllowedLayouts(BlockGridConfiguration.BlockGridAreaConfiguration area)
-    {
-        if (AllowedLayouts.TryGetValue(area, out var allowed))
-            return allowed;
+  public IEnumerable<string> GetAllowedLayouts( BlockGridConfiguration.BlockGridAreaConfiguration area ) {
+    if ( AllowedLayouts.TryGetValue( area, out var allowed ) )
+      return allowed;
 
-        return Enumerable.Empty<string>();
-    }
+    return Enumerable.Empty<string>();
+  }
 
-    public IEnumerable<string> GetRootAllowedLayouts()
-        => GetAllowedLayouts(RootArea);
+  public IEnumerable<string> GetRootAllowedLayouts()
+      => GetAllowedLayouts( RootArea );
 
-    public void AppendToRootLayouts(IEnumerable<string> allowed)
-    {
-        var rootAllowed = GetRootAllowedLayouts().ToList();
-        rootAllowed.AddRange(allowed);
-        AllowedLayouts[RootArea] = rootAllowed;
-    }
+  public void AppendToRootLayouts( IEnumerable<string> allowed ) {
+    var rootAllowed = GetRootAllowedLayouts().ToList();
+    rootAllowed.AddRange( allowed );
+    AllowedLayouts[RootArea] = rootAllowed;
+  }
 
-    public IEnumerable<string> AllEditors()
-        => AllowedEditors.SelectMany(x => x.Value).Distinct();
+  public IEnumerable<string> AllEditors()
+      => AllowedEditors.SelectMany( x => x.Value ).Distinct();
 
-    public BlockGridConfiguration ConvertToBlockGridConfiguration()
-    {
-        // layoutConfig.ToResult();
-        var result = new BlockGridConfiguration();
-        result.GridColumns = GridColumns;
+  public BlockGridConfiguration ConvertToBlockGridConfiguration() {
+    // layoutConfig.ToResult();
+    var result = new BlockGridConfiguration();
+    result.GridColumns = GridColumns;
 
-        result.Blocks = ContentBlocks
-            .Union(LayoutBlocks.Values)
-            .Where(x => x.ContentElementTypeKey != Guid.Empty)
-            .ToArray();
+    result.Blocks = ContentBlocks
+        .Union( LayoutBlocks.Values )
+        .Where( x => x.ContentElementTypeKey != Guid.Empty )
+        .ToArray();
 
-        var referencedGroupKeys = result.Blocks
-            .Select(x => x.GroupKey).Distinct().WhereNotNull()
-            .Select(x => Guid.TryParse(x, out var k) ? k : Guid.Empty)
-            .Distinct()
-            .ToArray();
+    var referencedGroupKeys = result.Blocks
+        .Select( x => x.GroupKey ).Distinct().WhereNotNull()
+        .Select( x => Guid.TryParse( x, out var k ) ? k : Guid.Empty )
+        .Distinct()
+        .ToArray();
 
-        result.BlockGroups = BlockGroups
-            .Where(x => referencedGroupKeys.Contains(x.Key))
-            .ToArray();
+    result.BlockGroups = BlockGroups
+        .Where( x => referencedGroupKeys.Contains( x.Key ) )
+        .ToArray();
 
 
-        return result;
+    return result;
 
-    }
+  }
 }
