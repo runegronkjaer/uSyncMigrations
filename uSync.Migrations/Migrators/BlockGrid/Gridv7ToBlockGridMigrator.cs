@@ -21,7 +21,7 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
   private readonly IGridConfig _gridConfig;
   private readonly SyncBlockMigratorCollection _blockMigrators;
   private readonly ILoggerFactory _loggerFactory;
-  private readonly ILogger<GridToBlockGridMigrator> _logger;
+  private readonly ILogger<Gridv7ToBlockGridMigrator> _logger;
 
   private readonly GridConventions _conventions;
 
@@ -34,7 +34,7 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
     _blockMigrators = blockMigrators;
     _conventions = new GridConventions( shortStringHelper );
     _loggerFactory = loggerFactory;
-    _logger = loggerFactory.CreateLogger<GridToBlockGridMigrator>();
+    _logger = loggerFactory.CreateLogger<Gridv7ToBlockGridMigrator>();
   }
 
   public override string GetEditorAlias( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context )

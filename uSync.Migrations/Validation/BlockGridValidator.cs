@@ -29,7 +29,7 @@ internal class BlockGridValidator : ISyncMigrationValidator
         if (options.PreferredMigrators == null) return Enumerable.Empty<MigrationMessage>();
 
         if (!options.PreferredMigrators.ContainsKey(UmbConstants.PropertyEditors.Aliases.Grid)
-            || options.PreferredMigrators[UmbConstants.PropertyEditors.Aliases.Grid] != nameof(GridToBlockGridMigrator)) 
+            || options.PreferredMigrators[UmbConstants.PropertyEditors.Aliases.Grid] != nameof( Gridv7ToBlockGridMigrator ) ) 
         {
             return Enumerable.Empty<MigrationMessage>();
         }

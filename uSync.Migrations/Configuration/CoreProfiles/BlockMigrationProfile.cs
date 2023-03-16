@@ -36,7 +36,7 @@ internal class BlockMigrationProfile : ISyncMigrationProfile
         PreferredMigrators = new Dictionary<string, string>
         {
 			{ UmbConstants.PropertyEditors.Aliases.NestedContent, nameof(NestedToBlockListMigrator) },
-			{ UmbConstants.PropertyEditors.Aliases.Grid, nameof(GridToBlockGridMigrator) }
+			{ UmbConstants.PropertyEditors.Aliases.Grid, nameof(Gridv7ToBlockGridMigrator) }
         }
     };
 }
