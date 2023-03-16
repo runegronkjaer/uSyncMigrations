@@ -12,6 +12,8 @@ using uSync.Migrations.Migrators.BlockGrid.Extensions;
 using uSync.Migrations.Migrators.Models;
 using uSync.Migrations.Context;
 using Microsoft.Extensions.Logging;
+using static Umbraco.Cms.Core.Constants.HttpContext;
+using uSync.Migrations.Extensions;
 
 namespace uSync.Migrations.Migrators.BlockGrid;
 
@@ -44,11 +46,12 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
     => nameof( ValueStorageType.Ntext );
 
   public override object GetConfigValues( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context ) {
-    if ( dataTypeProperty.ConfigAsString == null )
-      return new BlockGridConfiguration();
-
+    string gridItemsConfig = dataTypeProperty.PreValues?.GetPreValueOrDefault( "items", "{}" ) ?? "{}";
+    string gridRteConfig = dataTypeProperty.PreValues?.GetPreValueOrDefault( "rte", "{}" ) ?? "{}";
+    string gridConfig = "{\"items\":" + gridItemsConfig + ",\"rte\":" + gridRteConfig + "}";
+    //items
     var gridConfiguration = JsonConvert
-      .DeserializeObject<GridConfiguration>( dataTypeProperty.ConfigAsString );
+      .DeserializeObject<GridConfiguration>( gridConfig );
 
     if ( gridConfiguration == null )
       return new BlockGridConfiguration();
@@ -67,8 +70,11 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
     // Add the content blocks
     contentBlockHelper.AddContentBlocks( gridToBlockContext, context );
 
+    // Add the root blocks
+    contentBlockHelper.AddRootBlocks( gridToBlockContext, context );
+
     // Get resultant configuration
-    var result = gridToBlockContext.ConvertToBlockGridConfiguration();
+    BlockGridConfiguration result = gridToBlockContext.ConvertToBlockGridConfiguration();
 
     // Make sure all the block elements have been added to the migration context.
     context.ContentTypes.AddElementTypes( result.Blocks.Select( x => x.ContentElementTypeKey ), true );

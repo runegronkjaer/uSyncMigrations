@@ -120,4 +120,33 @@ internal class GridToBlockGridConfigBlockHelper {
   }
 
 
+  public void AddRootBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
+    // add the grid elements to the block config 
+    var gridContentTypeKeys = AddGridRootBlocksToConfig( gridBlockContext.GridConfig, gridBlockContext, context );
+  }
+
+  /// <summary>
+  ///  returns all the allowed/known content types for a section of the grid.
+  /// </summary>
+  private Dictionary<string, Guid[]> AddGridRootBlocksToConfig( IGridConfig gridConfig, GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
+    List<string> referencedEditors = gridBlockContext.GetRootAllowedLayouts().ToList();
+
+    var allowedContentTypes = new Dictionary<string, Guid[]>();
+
+    foreach ( IGridEditorConfig? editor in gridConfig.EditorsConfig.Editors
+        .Where( x => referencedEditors.Contains( "*" ) ||
+        referencedEditors.InvariantContains( x.Alias ) ) ) {
+      List<BlockGridConfiguration.BlockGridBlockConfiguration> blocks = editor.ConvertToBlockGridBlocks( context,
+          _syncBlockMigrators,
+          Guid.Empty ).ToList();
+
+      _logger.LogDebug( "Adding {editor} to block config for {count} blocks", editor.Alias, blocks.Count );
+
+      gridBlockContext.ContentBlocks.AddRange( blocks );
+
+      allowedContentTypes[editor.Alias] = blocks.Select( x => x.ContentElementTypeKey ).ToArray();
+    }
+
+    return allowedContentTypes;
+  }
 }

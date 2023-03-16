@@ -57,8 +57,12 @@ internal class GridToBlockGridConfigContext {
       => GetAllowedLayouts( RootArea );
 
   public void AppendToRootLayouts( IEnumerable<string> allowed ) {
-    var rootAllowed = GetRootAllowedLayouts().ToList();
-    rootAllowed.AddRange( allowed );
+    List<string> rootAllowed = GetRootAllowedLayouts().ToList();
+
+    if ( allowed.Any() ) {
+      rootAllowed.Remove( "*" );
+      rootAllowed.AddRange( allowed );
+    }
     AllowedLayouts[RootArea] = rootAllowed;
   }
 

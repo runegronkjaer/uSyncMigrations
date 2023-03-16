@@ -141,7 +141,7 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
 
         if ( gridArea.Grid == gridBlockContext.GridColumns ) {
           gridBlockContext.AppendToRootLayouts( allowed );
-          continue;
+          continue; //TODO: Why did someone not want us to go further??? If continue is on here no AllowedEditors will ever be set
         }
 
         var area = new BlockGridConfiguration.BlockGridAreaConfiguration {
@@ -155,8 +155,9 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
 
         rowAreas.Add( area );
 
-        if ( allowed.Any() )
+        if ( allowed.Any() ) {
           gridBlockContext.AllowedEditors[area] = allowed;
+        }
       }
 
       if ( rowAreas.Count == 0 ) continue;
