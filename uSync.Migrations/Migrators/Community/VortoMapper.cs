@@ -80,7 +80,7 @@ public class VortoMapper : SyncPropertyMigratorBase,
         try
         {
             var culturedValues = JsonConvert.DeserializeObject<CulturedPropertyValue>(contentProperty.Value);
-            return culturedValues != null
+            return culturedValues != null && culturedValues.Values != null
                 ? Attempt.Succeed(culturedValues)
                 : Attempt<CulturedPropertyValue>.Fail(new ArgumentNullException("Null value in vorto"));
         }
