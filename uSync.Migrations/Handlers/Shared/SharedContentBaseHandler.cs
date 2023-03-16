@@ -148,8 +148,10 @@ internal abstract class SharedContentBaseHandler<TEntity> : SharedHandlerBase<TE
 
             var newProperty = new XElement(propertyName);
 
-            // get editor alias from dtdguid
-            var variantEditorAlias = context.DataTypes.GetByDefinition(attempt.Result.DtdGuid);
+      // get editor alias from dtdguid
+      Guid dtdGuid = context.DataTypes.GetReplacement( attempt.Result.DtdGuid );
+
+      var variantEditorAlias = context.DataTypes.GetByDefinition( dtdGuid );
             if (variantEditorAlias != null)
             {
                 foreach (var variation in attempt.Result.Values)
