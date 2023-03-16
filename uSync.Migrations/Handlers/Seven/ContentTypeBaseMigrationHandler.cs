@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using uSync.Core;
@@ -33,30 +34,31 @@ internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContent
     protected override void UpdateTabs(XElement source, XElement target, SyncMigrationContext context)
     {
         var tabs = source.Element("Tabs");
-        if (tabs != null)
+     var key = source.Element( "Info" )?.Element( "Key" );
+        if (tabs != null && key != null)
         {
             var newTabs = new XElement("Tabs");
             foreach (var tab in tabs.Elements("Tab"))
             {
                 var newTab = XElement.Parse(tab.ToString());
-                newTab = UpdateTab(newTab, context);
+                newTab = UpdateTab(newTab, context, key.Value);
                 if (newTab != null) newTabs.Add(newTab);
             }
             target.Add(newTabs);
         }
     }
 
-    protected override void UpdatePropertyXml(XElement newProperty, SyncMigrationContext context)
+    protected override void UpdatePropertyXml(XElement newProperty, SyncMigrationContext context, string contentTypeGuid )
     {
         newProperty.Add(new XElement("MandatoryMessage", string.Empty));
         newProperty.Add(new XElement("ValidationRegExpMessage", string.Empty));
         newProperty.Add(new XElement("LabelOnTop", false));
 
         var tabNode = newProperty.Element("Tab");
-        UpdateTab(tabNode, context);
+    UpdateTab(tabNode, context, contentTypeGuid );
     }
 
-    internal XElement? UpdateTab(XElement tab, SyncMigrationContext context)
+    internal XElement? UpdateTab(XElement tab, SyncMigrationContext context, string contentTypeGuid)
     {
         var renamedTabs = context.GetChangedTabs();
 
@@ -75,22 +77,21 @@ internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContent
             }
         }
 
-        if (!deleteTab)
-        {
-            if (tab.Element("Key") == null)
-            {
-                tab.Add(new XElement("Key", alias.ToGuid().ToString()));
-            }
-            if (tab.Element("Caption") != null)
-            {
-                tab.Element("Caption").Value = caption;
-            }
-            else
-            {
-                tab.Value = caption;
-            }
-            tab.SetAttributeValue("Alias", alias);
-            tab.SetAttributeValue("Type", "Tab");
+    if ( !deleteTab ) {
+      if ( tab.Element( "Key" ) == null ) {
+        tab.Add( new XElement( "Key", ( alias + contentTypeGuid ).ToGuid().ToString() ) );
+      }
+      if ( tab.Element( "Caption" ) != null ) {
+        tab.Element( "Caption" ).Value = caption;
+      } else {
+        tab.Value = caption;
+      }
+      tab.SetAttributeValue( "Alias", alias );
+
+      if ( tab.Element( "Alias" ) == null ){ 
+        tab.Add( new XElement( "Alias", alias ) );
+    }
+      tab.SetAttributeValue("Type", "Tab");
             return tab;
         }
         return null;
