@@ -141,7 +141,7 @@ internal abstract class SharedContentBaseHandler<TEntity> : SharedHandlerBase<TE
     {
         // Get varied elements from the migrator.
         var attempt = migrator.GetVariedElements(migrationProperty, context);
-        if (attempt.Success && attempt.Result != null)
+        if (attempt.Success && attempt.Result != null && attempt.Result.Values != null)
         {
             // this returns an object which tells us what datatype to use
             // and a dictionary of cultuire / values we can migrate. 
