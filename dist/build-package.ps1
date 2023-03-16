@@ -14,7 +14,7 @@ param (
 
     [Parameter()]
     [string]
-    $env = 'release', #build environment to use when packing
+    $env = 'debug', #build environment to use when packing
 
     [Parameter()]
     [switch]
