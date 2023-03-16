@@ -112,8 +112,16 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
     protected virtual void UpdateProperties(XElement source, XElement target, string alias, SyncMigrationContext context)
     {
         var properties = source.Element("GenericProperties");
+    var info = source.Element( "Info" );
+    if ( info == null ) {
+      return;
+    }
+      var key = info.Element( "Key" );
+    if ( key == null ) {
+      return;
+    }
 
-        var newProperties = new XElement("GenericProperties");
+    var newProperties = new XElement("GenericProperties");
         if (properties != null)
         {
             foreach (var property in properties.Elements("GenericProperty"))
@@ -130,7 +138,8 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
                 // update the datatype we are using (this might be new). 
                 UpdatePropertyEditor(alias, newProperty, context);
 
-                UpdatePropertyXml(newProperty, context);
+
+        UpdatePropertyXml( newProperty, context, key.Value);
 
                 newProperties.Add(newProperty);
             }
@@ -164,7 +173,7 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
         }
 
     }
-    protected abstract void UpdatePropertyXml(XElement newProperty, SyncMigrationContext context);
+    protected abstract void UpdatePropertyXml(XElement newProperty, SyncMigrationContext context, string contentTypeGuid );
 
 
     /// <summary>
