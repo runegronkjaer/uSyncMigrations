@@ -31,12 +31,12 @@ internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContent
 
   protected override void UpdateTabs( XElement source, XElement target, SyncMigrationContext context ) {
     var tabs = source.Element( "Tabs" );
-    var key = source.Element( "Info" )?.Element( "Key" );
-    if ( tabs != null && key != null ) {
+    var key = source.Element( "Info" )?.Element( "Key" )?.ValueOrDefault( Guid.Empty ) ?? source.Attribute( "Key" )?.ValueOrDefault( Guid.Empty ) ?? Guid.Empty;
+    if ( tabs != null && key != Guid.Empty ) {
       var newTabs = new XElement( "Tabs" );
       foreach ( var tab in tabs.Elements( "Tab" ) ) {
         var newTab = XElement.Parse( tab.ToString() );
-        newTab = UpdateTab( newTab, context, key.Value );
+        newTab = UpdateTab( newTab, context, key.ToString() );
         if ( newTab != null ) newTabs.Add( newTab );
       }
       target.Add( newTabs );

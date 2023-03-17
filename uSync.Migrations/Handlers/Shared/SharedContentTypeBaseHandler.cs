@@ -106,8 +106,8 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
     if ( info == null ) {
       return;
     }
-    var key = info.Element( "Key" );
-    if ( key == null ) {
+    var key = info.Element( "Key" )?.ValueOrDefault( Guid.Empty ) ?? source.Attribute( "Key" )?.ValueOrDefault( Guid.Empty ) ?? Guid.Empty;
+    if ( key == Guid.Empty ) {
       return;
     }
 
@@ -126,7 +126,7 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
         UpdatePropertyEditor( alias, newProperty, context );
 
 
-        UpdatePropertyXml( newProperty, context, key.Value );
+        UpdatePropertyXml( newProperty, context, key.ToString() );
 
         newProperties.Add( newProperty );
       }

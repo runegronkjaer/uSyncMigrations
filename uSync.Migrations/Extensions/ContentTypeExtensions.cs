@@ -43,24 +43,29 @@ internal static class ContentTypeExtensions {
       foreach ( var property in newDocType.Properties ) {
         index++;
 
-        var dataType = dataTypeService.GetDataType( property.DataTypeAlias );
-        if ( dataType == null ) continue;
+        Umbraco.Cms.Core.Models.IDataType? dataType = dataTypeService.GetDataType( property.DataTypeAlias );
+        if ( dataType == null && property.DataTypeGuid != Guid.Empty ) {
+          dataType = dataTypeService.GetDataType( property.DataTypeGuid );
+        }
+        if ( dataType == null ) {
+          continue;
+        }
 
         var propNode = new XElement( "GenericProperty",
-        new XElement( "Key", property.Name.ToGuid() ),
-          new XElement( "Name", property.Name ),
-          new XElement( "Alias", property.Alias ),
-          new XElement( "Definition", dataType.Key ),
-          new XElement( "Type", dataType.EditorAlias ),
-          new XElement( "Mandatory", false ),
-          new XElement( "Validation", "" ),
-          new XElement( "Description", new XCData( "" ) ),
-          new XElement( "SortOrder", index ),
-          new XElement( "Tab", "Block", new XAttribute( "Alias", "block" ) ),
-          new XElement( "Variations", "Nothing" ),
-          new XElement( "MandatoryMessage", "" ),
-          new XElement( "ValidationRegExpMessage", "" ),
-          new XElement( "LabelOnTop", "" ) );
+          new XElement( "Key", property.Name.ToGuid() ),
+            new XElement( "Name", property.Name ),
+            new XElement( "Alias", property.Alias ),
+            new XElement( "Definition", dataType.Key ),
+            new XElement( "Type", dataType.EditorAlias ),
+            new XElement( "Mandatory", false ),
+            new XElement( "Validation", "" ),
+            new XElement( "Description", new XCData( "" ) ),
+            new XElement( "SortOrder", index ),
+            new XElement( "Tab", "Block", new XAttribute( "Alias", "block" ) ),
+            new XElement( "Variations", "Nothing" ),
+            new XElement( "MandatoryMessage", "" ),
+            new XElement( "ValidationRegExpMessage", "" ),
+            new XElement( "LabelOnTop", "" ) );
 
         properties.Add( propNode );
       }

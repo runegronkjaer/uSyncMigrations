@@ -59,9 +59,7 @@ internal class GridToBlockGridConfigBlockHelper {
 
     // now add the editor to the right bit of the blocks.
     AddEditorsToAllowedAreasInBlocks( gridContentTypeKeys, gridBlockContext, context );
-
   }
-
 
   private void AddEditorsToAllowedAreasInBlocks( Dictionary<string, Guid[]> gridContentTypeKeys, GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext migrationContext ) {
     foreach ( var (area, gridEditorAliases) in gridBlockContext.AllowedEditors ) {
@@ -118,7 +116,6 @@ internal class GridToBlockGridConfigBlockHelper {
 
     return allowedContentTypes;
   }
-
 
   public void AddRootBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
     // add the grid elements to the block config 
