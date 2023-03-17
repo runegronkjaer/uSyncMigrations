@@ -62,6 +62,9 @@ namespace uSync.Migrations.Migrators.Community {
            ? new BlockListConfiguration.NumberRange { Min = 0, Max = 1 }
            : new BlockListConfiguration.NumberRange { Min = 0, Max = fieldsets.MaxFieldsets ?? 0 };
 
+      //TODO: Brug til at oprette content types
+      //context.ContentTypes.AddElementTypes( result.Blocks.Select( x => x.ContentElementTypeKey ), true );
+
       return new BlockListConfiguration {
         Blocks = blocks?.ToArray() ?? Array.Empty<BlockListConfiguration.BlockConfiguration>(),
         ValidationLimit = validationLimit,
