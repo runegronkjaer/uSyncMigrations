@@ -71,11 +71,19 @@ public class VortoMapper : SyncPropertyMigratorBase,
 
   public Attempt<CulturedPropertyValue> GetVariedElements( SyncMigrationContentProperty contentProperty, SyncMigrationContext context ) {
     try {
+      if ( contentProperty?.Value == null ) {
+        return Attempt<CulturedPropertyValue>.Fail( new Exception( "No culturedValues found on vorto property" ) );
+      }
+
       CulturedPropertyValue? culturedValues = JsonConvert.DeserializeObject<CulturedPropertyValue>( contentProperty.Value );
 
-      if ( culturedValues != null && culturedValues.Values != null ) {
+      if ( culturedValues == null ) {
+        return Attempt<CulturedPropertyValue>.Fail( new Exception( "No culturedValues found on vorto property" ) );
+      }
+
+      if ( culturedValues.Values != null ) {
         return Attempt.Succeed( culturedValues );
-      } else if ( culturedValues != null ) {
+      } else {
         //Must be an issue with the data so we just add empty values for all languages
         IEnumerable<ILanguage> allLanguages = _localizationService.GetAllLanguages();
         return Attempt.Succeed( new CulturedPropertyValue() {
@@ -84,9 +92,6 @@ public class VortoMapper : SyncPropertyMigratorBase,
         } );
       }
 
-      return culturedValues != null && culturedValues.Values != null
-          ? Attempt.Succeed( culturedValues )
-          : Attempt<CulturedPropertyValue>.Fail( new ArgumentNullException( "Null value in vorto" ) );
     } catch ( Exception ex ) {
       return Attempt<CulturedPropertyValue>.Fail( ex );
     }
