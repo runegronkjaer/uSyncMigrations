@@ -11,82 +11,84 @@ using uSync.Migrations.Models;
 
 namespace uSync.Migrations.Migrators.Community;
 
-[SyncMigrator("Our.Umbraco.Vorto")]
+[SyncMigrator( "Our.Umbraco.Vorto" )]
 public class VortoMapper : SyncPropertyMigratorBase,
     ISyncReplacablePropertyMigrator,
-    ISyncVariationPropertyMigrator
-{
-    private readonly IDataTypeService _dataTypeService;
+    ISyncVariationPropertyMigrator {
+  private readonly IDataTypeService _dataTypeService;
+  private readonly ILocalizationService _localizationService;
 
-    public VortoMapper(IDataTypeService dataTypeService)
-    {
-        _dataTypeService = dataTypeService;
-    }
+  public VortoMapper( IDataTypeService dataTypeService, ILocalizationService localizationService ) {
+    _dataTypeService = dataTypeService;
+    _localizationService = localizationService;
+  }
 
-    public override object GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
+  public override object GetConfigValues( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context )
         => string.Empty;
 
-    public override string GetEditorAlias(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
-    {
-        var wrappedDataType = GetWrappedDatatype(dataTypeProperty.PreValues);
-        if (wrappedDataType != null)
-        {
-            return wrappedDataType.EditorAlias;
-        }
-
-        return string.Empty;
+  public override string GetEditorAlias( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context ) {
+    var wrappedDataType = GetWrappedDatatype( dataTypeProperty.PreValues );
+    if ( wrappedDataType != null ) {
+      return wrappedDataType.EditorAlias;
     }
 
-    /// <summary>
-    ///  vorto properties don't actually need to be on the target - the properties they wrap should already be there. 
-    ///  so the migrator needs to actually tell the process what should be here.
-    /// </summary>
-    /// <param name="dataTypeProperty"></param>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public ReplacementDataTypeInfo? GetReplacementEditorId(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
-    {
-        var wrappedDataType = GetWrappedDatatype(dataTypeProperty.PreValues);
-        if (wrappedDataType != null)
-        {
-            return new ReplacementDataTypeInfo(wrappedDataType.Key, wrappedDataType.EditorAlias)
-            {
-                Variation = "Culture"
-            };
-        }
+    return string.Empty;
+  }
 
-        return null;
+  /// <summary>
+  ///  vorto properties don't actually need to be on the target - the properties they wrap should already be there. 
+  ///  so the migrator needs to actually tell the process what should be here.
+  /// </summary>
+  /// <param name="dataTypeProperty"></param>
+  /// <param name="context"></param>
+  /// <returns></returns>
+  public ReplacementDataTypeInfo? GetReplacementEditorId( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context ) {
+    var wrappedDataType = GetWrappedDatatype( dataTypeProperty.PreValues );
+    if ( wrappedDataType != null ) {
+      return new ReplacementDataTypeInfo( wrappedDataType.Key, wrappedDataType.EditorAlias ) {
+        Variation = "Culture"
+      };
     }
 
-    private IDataType? GetWrappedDatatype(IReadOnlyCollection<PreValue> preValues)
-    {
-        var dataType = preValues.FirstOrDefault(x => x.Alias.Equals("dataType"));
-        if (dataType == null) return null;
+    return null;
+  }
 
-        var value = JsonConvert.DeserializeObject<JObject>(dataType.Value);
-        if (value is null) return null;
+  private IDataType? GetWrappedDatatype( IReadOnlyCollection<PreValue> preValues ) {
+    var dataType = preValues.FirstOrDefault( x => x.Alias.Equals( "dataType" ) );
+    if ( dataType == null ) return null;
 
-        // guid is the guid of the wrapped datatype. 
-        var attempt = value.Value<string>("guid").TryConvertTo<Guid>();
+    var value = JsonConvert.DeserializeObject<JObject>( dataType.Value );
+    if ( value is null ) return null;
 
-        if (attempt)
-            return _dataTypeService.GetDataType(attempt.Result);
+    // guid is the guid of the wrapped datatype. 
+    var attempt = value.Value<string>( "guid" ).TryConvertTo<Guid>();
 
-        return null;
+    if ( attempt )
+      return _dataTypeService.GetDataType( attempt.Result );
+
+    return null;
+  }
+
+  public Attempt<CulturedPropertyValue> GetVariedElements( SyncMigrationContentProperty contentProperty, SyncMigrationContext context ) {
+    try {
+      CulturedPropertyValue? culturedValues = JsonConvert.DeserializeObject<CulturedPropertyValue>( contentProperty.Value );
+
+      if ( culturedValues != null && culturedValues.Values != null ) {
+        return Attempt.Succeed( culturedValues );
+      } else if ( culturedValues != null ) {
+        //Must be an issue with the data so we just add empty values for all languages
+        IEnumerable<ILanguage> allLanguages = _localizationService.GetAllLanguages();
+        return Attempt.Succeed( new CulturedPropertyValue() {
+          DtdGuid = culturedValues.DtdGuid,
+          Values = allLanguages.ToDictionary( l => l.IsoCode, l => "" ),
+        } );
+      }
+
+      return culturedValues != null && culturedValues.Values != null
+          ? Attempt.Succeed( culturedValues )
+          : Attempt<CulturedPropertyValue>.Fail( new ArgumentNullException( "Null value in vorto" ) );
+    } catch ( Exception ex ) {
+      return Attempt<CulturedPropertyValue>.Fail( ex );
     }
-
-    public Attempt<CulturedPropertyValue> GetVariedElements(SyncMigrationContentProperty contentProperty, SyncMigrationContext context)
-    {
-        try
-        {
-            var culturedValues = JsonConvert.DeserializeObject<CulturedPropertyValue>(contentProperty.Value);
-            return culturedValues != null && culturedValues.Values != null
-                ? Attempt.Succeed(culturedValues)
-                : Attempt<CulturedPropertyValue>.Fail(new ArgumentNullException("Null value in vorto"));
-        }
-        catch (Exception ex)
-        {
-            return Attempt<CulturedPropertyValue>.Fail(ex);
-        }
-    }
+  }
 }

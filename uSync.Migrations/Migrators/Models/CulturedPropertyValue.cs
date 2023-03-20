@@ -1,6 +1,5 @@
 ﻿namespace uSync.Migrations.Migrators.Models;
 
-
 /// <summary>
 ///  How a single value can be split into multiple 'variants' 
 /// </summary>
