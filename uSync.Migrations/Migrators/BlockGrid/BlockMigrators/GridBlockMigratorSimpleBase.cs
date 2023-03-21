@@ -26,7 +26,7 @@ public abstract class GridBlockMigratorSimpleBase {
   /// </summary>
   /// <param name="editorConfig"></param>
   /// <returns></returns>
-  public IEnumerable<NewContentTypeInfo> AdditionalContentTypes( IGridEditorConfig editor ) {
+  public IEnumerable<NewContentTypeInfo> AdditionalContentTypes( IGridEditorConfig editor, SyncMigrationContext context ) {
     var alias = this.GetContentTypeAlias( editor );
 
     List<NewContentTypeProperty> properties = new()      {
@@ -44,10 +44,11 @@ public abstract class GridBlockMigratorSimpleBase {
         string? description = editorJson.Value<string>( "description" );
 
         if ( !string.IsNullOrEmpty( propAlias ) && !string.IsNullOrEmpty( dataTypeGuidStr ) && Guid.TryParse( dataTypeGuidStr, out Guid dataTypeGuid ) ) {
+          Guid finalDataTypeGuid =  context.DataTypes.GetReplacement( dataTypeGuid );
           properties.Add(  new NewContentTypeProperty {
             Alias = propAlias,
             Name = name ?? propAlias,
-            DataTypeGuid = dataTypeGuid,
+            DataTypeGuid = finalDataTypeGuid,
           });
         }
       }

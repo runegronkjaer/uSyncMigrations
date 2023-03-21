@@ -39,12 +39,11 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
     var properties = source.Element( "GenericProperties" )?.Elements( "GenericProperty" ) ?? Enumerable.Empty<XElement>();
 
     foreach ( var property in properties ) {
-      var editorAlias = property.Element( "Type" ).ValueOrDefault( string.Empty );
-      var definition = property.Element( "Definition" ).ValueOrDefault( Guid.Empty );
-      var alias = property.Element( "Alias" )?.ValueOrDefault( string.Empty ) ?? string.Empty;
+      string editorAlias = property.Element( "Type" ).ValueOrDefault( string.Empty );
+      Guid definition = property.Element( "Definition" ).ValueOrDefault( Guid.Empty );
+      string alias = property.Element( "Alias" )?.ValueOrDefault( string.Empty ) ?? string.Empty;
 
-      context.ContentTypes.AddProperty( contentTypeAlias, alias,
-              editorAlias, context.DataTypes.GetByDefinition( definition ) );
+      context.ContentTypes.AddProperty( contentTypeAlias, alias, editorAlias, context.DataTypes.GetByDefinition( definition ) );
 
       //
       // for now we are doing this just for media folders, but it might be
@@ -138,8 +137,10 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
   protected virtual void UpdatePropertyEditor( string alias, XElement newProperty, SyncMigrationContext context ) {
     var propertyAlias = newProperty.Element( "Alias" ).ValueOrDefault( string.Empty );
 
-    var updatedType = context.ContentTypes.GetEditorAliasByTypeAndProperty( alias, propertyAlias )?.UpdatedEditorAlias ?? propertyAlias;
-    newProperty.CreateOrSetElement( "Type", updatedType );
+    string? updatedType = context.ContentTypes.GetEditorAliasByTypeAndProperty( alias, propertyAlias )?.UpdatedEditorAlias ?? null;
+    if ( updatedType != null ) {
+      newProperty.CreateOrSetElement( "Type", updatedType );
+    }
 
     var definitionElement = newProperty.Element( "Definition" );
     if ( definitionElement == null ) return;

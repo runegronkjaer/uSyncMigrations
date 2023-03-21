@@ -11,7 +11,7 @@ public interface ISyncBlockMigrator
 	// the grid aliases this block migrator work for., 
 	string[] Aliases { get; }
 
-	IEnumerable<NewContentTypeInfo> AdditionalContentTypes(IGridEditorConfig editorConfig);
+	IEnumerable<NewContentTypeInfo> AdditionalContentTypes( IGridEditorConfig editor, SyncMigrationContext context );
 	IEnumerable<string> GetAllowedContentTypes(IGridEditorConfig config, SyncMigrationContext context);
 
 	string GetContentTypeAlias(GridValue.GridControl control);

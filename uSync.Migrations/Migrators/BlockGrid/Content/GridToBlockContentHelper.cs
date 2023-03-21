@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
-
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -23,14 +25,18 @@ internal class GridToBlockContentHelper {
   private readonly SyncBlockMigratorCollection _blockMigrators;
   private readonly GridConventions _conventions;
   private readonly ILogger<GridToBlockContentHelper> _logger;
+  private readonly IContentTypeService _contentTypeService;
+  private IEnumerable<IContentType> AllElemntTypes;
 
   public GridToBlockContentHelper(
         GridConventions gridConventions,
         SyncBlockMigratorCollection blockMigrators,
-        ILogger<GridToBlockContentHelper> logger ) {
+        ILogger<GridToBlockContentHelper> logger,
+        IContentTypeService contentTypeService ) {
     _blockMigrators = blockMigrators;
     _conventions = gridConventions;
     _logger = logger;
+    _contentTypeService = contentTypeService;
   }
 
   /// <summary>
@@ -176,7 +182,14 @@ internal class GridToBlockContentHelper {
       return null;
     }
 
-    var contentTypeKey = context.ContentTypes.GetKeyByAlias( contentTypeAlias );
+    Guid contentTypeKey = context.ContentTypes.GetKeyByAlias( contentTypeAlias );
+    IContentType? contentType = null;
+    if ( contentTypeKey == Guid.Empty ) {
+      IEnumerable<IContentType> allElemntTypes = GetAllElemntTypes();
+      contentType = allElemntTypes.FirstOrDefault( et => et.Alias.Equals( contentTypeAlias ) );
+      contentTypeKey = contentType?.GetUdi().Guid ?? Guid.Empty;
+    }
+
     if ( contentTypeKey == Guid.Empty ) {
       _logger.LogWarning( "Cannot find content type key from alias {alias}", contentTypeAlias );
       return null;
@@ -188,26 +201,46 @@ internal class GridToBlockContentHelper {
       ContentTypeKey = contentTypeKey
     };
 
+    foreach ( var (gridProperty, value) in blockMigrator.GetPropertyValues( control, context ) ) {
+      //Migrations.Models.EditorAliasInfo? editorAlias = context.ContentTypes.GetEditorAliasByTypeAndProperty( contentTypeAlias, propertyAlias );
+      JToken valueAsToken = (JToken)value;
+      foreach ( JProperty childToken in valueAsToken.Values() ) {
+        string? newDataTypeGuidString = childToken.Value["dataTypeGuid"]?.Value<string>();
+        string? propertyAlias = childToken.Value["editorAlias"]?.Value<string>();
+        string? propertyValue = childToken.Value["value"]?.ToString();
+        string? propertyName = childToken.Value["editorName"]?.Value<string>();
 
-    foreach ( var (propertyAlias, value) in blockMigrator.GetPropertyValues( control, context ) ) {
-      var editorAlias = context.ContentTypes.GetEditorAliasByTypeAndProperty( contentTypeAlias, propertyAlias );
-      var propertyValue = value;
-      if ( editorAlias != null ) {
+        if ( Guid.TryParse( newDataTypeGuidString, out Guid newDataTypeGuid ) && !string.IsNullOrEmpty( propertyAlias ) ) {
+          Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
+          string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
+          Migrations.Models.EditorAliasInfo? editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
 
-        var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
-        if ( migrator != null ) {
-          var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, value?.ToString() ?? string.Empty );
-          propertyValue = migrator.GetContentValue( property, context );
-          _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
-        } else {
-          _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
+          if ( editorAlias != null ) {
+
+            var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
+            if ( migrator != null ) {
+              var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
+              propertyValue = migrator.GetContentValue( property, context );
+              _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
+            } else {
+              _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
+            }
+          }
+
+          data.RawPropertyValues[propertyAlias] = propertyValue;
         }
       }
-
-      data.RawPropertyValues[propertyAlias] = propertyValue;
     }
 
     return data;
+  }
+
+  private IEnumerable<IContentType> GetAllElemntTypes() {
+    if ( AllElemntTypes != null ) {
+      return AllElemntTypes;
+    }
+    AllElemntTypes = _contentTypeService.GetAllElementTypes();
+    return AllElemntTypes;
   }
 }
 

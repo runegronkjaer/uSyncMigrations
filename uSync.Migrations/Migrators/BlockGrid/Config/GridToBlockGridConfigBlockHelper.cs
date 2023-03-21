@@ -39,7 +39,7 @@ internal class GridToBlockGridConfigBlockHelper {
 
       _logger.LogDebug( "{editor}/{view} has migrator {migrator}", editor.Alias, editor.View, blockMigrator.GetType().Name );
 
-      var additionalContentTypes = blockMigrator.AdditionalContentTypes( editor );
+      var additionalContentTypes = blockMigrator.AdditionalContentTypes( editor, context );
       if ( additionalContentTypes == null ) {
         _logger.LogDebug( "Migrator {migrator} does not require additional doctypes", blockMigrator.GetType().Name );
         continue;

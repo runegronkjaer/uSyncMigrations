@@ -14,6 +14,7 @@ using uSync.Migrations.Context;
 using Microsoft.Extensions.Logging;
 using static Umbraco.Cms.Core.Constants.HttpContext;
 using uSync.Migrations.Extensions;
+using Umbraco.Cms.Core.Services;
 
 namespace uSync.Migrations.Migrators.BlockGrid;
 
@@ -24,6 +25,7 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
   private readonly SyncBlockMigratorCollection _blockMigrators;
   private readonly ILoggerFactory _loggerFactory;
   private readonly ILogger<Gridv7ToBlockGridMigrator> _logger;
+  private readonly IContentTypeService _contentTypeService;
 
   private readonly GridConventions _conventions;
 
@@ -31,12 +33,14 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
       IGridConfig gridConfig,
       SyncBlockMigratorCollection blockMigrators,
       IShortStringHelper shortStringHelper,
-      ILoggerFactory loggerFactory ) {
+      ILoggerFactory loggerFactory,
+      IContentTypeService contentTypeService ) {
     _gridConfig = gridConfig;
     _blockMigrators = blockMigrators;
     _conventions = new GridConventions( shortStringHelper );
     _loggerFactory = loggerFactory;
     _logger = loggerFactory.CreateLogger<Gridv7ToBlockGridMigrator>();
+    _contentTypeService = contentTypeService;
   }
 
   public override string GetEditorAlias( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context )
@@ -99,7 +103,7 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
     }
 
     var helper = new GridToBlockContentHelper( _conventions, _blockMigrators,
-      _loggerFactory.CreateLogger<GridToBlockContentHelper>() );
+      _loggerFactory.CreateLogger<GridToBlockContentHelper>(), _contentTypeService );
 
     var blockValue = helper.ConvertToBlockValue( source, context );
     if ( blockValue == null ) {

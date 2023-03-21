@@ -52,7 +52,7 @@ internal static class ContentTypeExtensions {
         }
 
         var propNode = new XElement( "GenericProperty",
-          new XElement( "Key", property.Name.ToGuid() ),
+          new XElement( "Key", ( newDocType.Alias + property.Name + property.Alias ).ToGuid() ),
             new XElement( "Name", property.Name ),
             new XElement( "Alias", property.Alias ),
             new XElement( "Definition", dataType.Key ),

@@ -6,6 +6,7 @@ public class ContentTypeMigrationContext {
   private Dictionary<string, Guid> _contentTypeKeys { get; set; } = new( StringComparer.OrdinalIgnoreCase );
   private Dictionary<string, HashSet<string>> _contentTypeCompositions { get; set; } = new( StringComparer.OrdinalIgnoreCase );
   private Dictionary<string, EditorAliasInfo> _propertyTypes { get; set; } = new( StringComparer.OrdinalIgnoreCase );
+  private Dictionary<string, EditorAliasInfo> _propertyTypesByNewEditorAlias { get; set; } = new( StringComparer.OrdinalIgnoreCase );
 
   private HashSet<string> _ignoredProperties = new( StringComparer.OrdinalIgnoreCase );
 
@@ -80,6 +81,10 @@ public class ContentTypeMigrationContext {
       string.IsNullOrWhiteSpace( newAlias ) == false &&
       _propertyTypes.TryAdd( $"{contentTypeAlias}_{propertyAlias}",
       new EditorAliasInfo( originalAlias, newAlias ) );
+    if ( !string.IsNullOrEmpty( newAlias ) && !string.IsNullOrEmpty( originalAlias ) ) {
+      _ = _propertyTypesByNewEditorAlias.TryAdd( newAlias,
+        new EditorAliasInfo( originalAlias, newAlias ) );
+    }
   }
 
   /// <summary>
@@ -102,6 +107,14 @@ public class ContentTypeMigrationContext {
           return alias1;
         }
       }
+    }
+
+    return null;
+  }
+
+  public EditorAliasInfo? GetEditorAliasByNewEditorAlias( string? newEditorAlias ) {
+    if ( !string.IsNullOrEmpty( newEditorAlias ) && _propertyTypesByNewEditorAlias?.TryGetValue( newEditorAlias, out var alias ) == true ) {
+      return alias;
     }
 
     return null;

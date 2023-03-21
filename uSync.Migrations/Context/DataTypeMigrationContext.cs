@@ -53,6 +53,16 @@ public class DataTypeMigrationContext {
       ? replacement
       : orginal;
 
+  public Guid? GetOriginal( Guid replacement ) {
+    foreach ( KeyValuePair<Guid, Guid> vals in _dataTypeReplacements ) {
+      if ( replacement == vals.Value ) {
+        return vals.Key;
+      }
+    }
+
+    return null;
+  }
+
   /// <summary>
   ///  add a variation (e.g culture, segment or nothing) value for a datatype to the context.
   /// </summary>
