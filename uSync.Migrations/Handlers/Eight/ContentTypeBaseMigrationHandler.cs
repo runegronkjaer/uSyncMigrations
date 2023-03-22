@@ -50,9 +50,12 @@ internal class ContentTypeBaseMigrationHandler<TEntity> : SharedContentTypeBaseH
             target.Add(XElement.Parse(sourceTabs.ToString()));
     }
 
-    protected override void CheckVariations(XElement target)
+    protected override void CheckVariations(XElement target, SyncMigrationContext context )
     {
         // for v8 we are assuming variations are sound (for now!)
     }
 
+  protected override bool HasVariations( XElement target ) {
+    return false;
+  }
 }

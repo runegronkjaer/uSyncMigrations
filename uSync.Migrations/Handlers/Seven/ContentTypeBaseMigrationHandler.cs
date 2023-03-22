@@ -83,6 +83,9 @@ internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContent
         tab.Add( new XElement( "Alias", alias ) );
       }
       tab.SetAttributeValue( "Type", "Tab" );
+      if ( tab.Element( "Type" ) == null ) {
+        tab.Add( new XElement( "Type", "Tab" ) );
+      }
       return tab;
     }
     return null;
@@ -126,7 +129,7 @@ internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContent
     }
   }
 
-  protected override void CheckVariations( XElement target ) {
+  protected override void CheckVariations( XElement target, SyncMigrationContext context ) {
     if ( target.Element( "Info" ) == null ) return;
 
     var contentTypeVariations = "Nothing";
@@ -142,6 +145,38 @@ internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContent
       }
     }
 
+    if ( contentTypeVariations == "Nothing" ) {
+      var compositions = target.Element( "Info" )?.Element( "Compositions" );
+      if ( compositions != null ) {
+        foreach ( var composition in compositions.Elements( "Composition" ) ) {
+          string compositionAlias = composition.ValueOrDefault( string.Empty );
+          bool hasVariation = context.ContentTypes.HasVariation( compositionAlias );
+          if ( hasVariation ) {
+            contentTypeVariations = "Culture";
+            break;
+          }
+        }
+      }
+    }
+
     target.Element( "Info" ).CreateOrSetElement( "Variations", contentTypeVariations );
+  }
+
+  protected override bool HasVariations( XElement target ) {
+    if ( target.Element( "Info" ) == null ) {
+      return false;
+    }
+
+    var properties = target.Element( "GenericProperties" );
+    if ( properties != null ) {
+      foreach ( var property in properties.Elements( "GenericProperty" ) ) {
+        var variations = property.Element( "Variations" ).ValueOrDefault( string.Empty );
+        if ( variations != "Nothing" ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }

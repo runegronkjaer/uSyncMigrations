@@ -35,6 +35,11 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
 
     var compositions = source.Element( "Info" )?.Element( "Compositions" )?.Elements( "Composition" )?.Select( x => x.Value ) ?? Enumerable.Empty<string>();
     context.ContentTypes.AddCompositions( contentTypeAlias, compositions );
+    bool hasVariations = HasVariations( source );
+    if ( !hasVariations ) { 
+      
+    }
+    context.ContentTypes.AddHasVariation( contentTypeAlias, hasVariations );
 
     var properties = source.Element( "GenericProperties" )?.Elements( "GenericProperty" ) ?? Enumerable.Empty<XElement>();
 
@@ -87,7 +92,7 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
     UpdateTabs( source, target, context );
 
     if ( ItemType == nameof( ContentType ) ) {
-      CheckVariations( target );
+      CheckVariations( target, context );
     }
 
     return target;
@@ -97,7 +102,8 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
   protected abstract void UpdateInfoSection( XElement? info, XElement target, Guid key, SyncMigrationContext context );
   protected abstract void UpdateStructure( XElement source, XElement target );
   protected abstract void UpdateTabs( XElement source, XElement target, SyncMigrationContext context );
-  protected abstract void CheckVariations( XElement target );
+  protected abstract void CheckVariations( XElement target, SyncMigrationContext context );
+  protected abstract bool HasVariations( XElement target );
 
   protected virtual void UpdateProperties( XElement source, XElement target, string alias, SyncMigrationContext context ) {
     var properties = source.Element( "GenericProperties" );

@@ -5,6 +5,7 @@ public class ContentTypeMigrationContext {
   private Dictionary<Guid, string> _contentTypeAliases { get; set; } = new();
   private Dictionary<string, Guid> _contentTypeKeys { get; set; } = new( StringComparer.OrdinalIgnoreCase );
   private Dictionary<string, HashSet<string>> _contentTypeCompositions { get; set; } = new( StringComparer.OrdinalIgnoreCase );
+  private Dictionary<string, bool> _contentTypeHasVariations { get; set; } = new( StringComparer.OrdinalIgnoreCase );
   private Dictionary<string, EditorAliasInfo> _propertyTypes { get; set; } = new( StringComparer.OrdinalIgnoreCase );
   private Dictionary<string, EditorAliasInfo> _propertyTypesByNewEditorAlias { get; set; } = new( StringComparer.OrdinalIgnoreCase );
 
@@ -55,6 +56,30 @@ public class ContentTypeMigrationContext {
     _ = string.IsNullOrWhiteSpace( contentTypeAlias ) == false &&
       compositionAliases?.Any() == true &&
       _contentTypeCompositions.TryAdd( contentTypeAlias, compositionAliases.ToHashSet() );
+  }
+
+  public void AddHasVariation( string? contentTypeAlias, bool hasVariation ) {
+    _ = string.IsNullOrWhiteSpace( contentTypeAlias ) == false &&
+      _contentTypeHasVariations.TryAdd( contentTypeAlias, hasVariation );
+  }
+
+  public bool HasVariation( string? contentTypeAlias ) {
+    if ( !string.IsNullOrWhiteSpace( contentTypeAlias ) ) {
+      if ( _contentTypeHasVariations.TryGetValue( contentTypeAlias, out bool hasVariation ) && hasVariation == true ) {
+        return true;
+      }
+
+      if ( _contentTypeCompositions.TryGetValue( contentTypeAlias, out HashSet<string>? compositions ) && compositions?.Any() == true ) {
+        foreach ( string compositionAlias in compositions ) {
+          hasVariation = HasVariation( compositionAlias );
+          if ( hasVariation ) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   public bool TryGetCompositionsByAlias( string? contentTypeAlias, out IEnumerable<string>? compositionAliases ) {
