@@ -29,8 +29,8 @@ internal class DocTypeGridEditorBlockMigrator : ISyncBlockMigrator
 	///  because all the content types it uses are already
 	///  in the migration.
 	/// </summary>
-	public IEnumerable<NewContentTypeInfo> AdditionalContentTypes(IGridEditorConfig editorConfig)
-		=> Enumerable.Empty<NewContentTypeInfo>();
+	public IEnumerable<NewContentTypeInfo> AdditionalContentTypes( IGridEditorConfig editor, SyncMigrationContext context )
+    => Enumerable.Empty<NewContentTypeInfo>();
 
 	public IEnumerable<string> GetAllowedContentTypes(IGridEditorConfig config, SyncMigrationContext context)
 	{

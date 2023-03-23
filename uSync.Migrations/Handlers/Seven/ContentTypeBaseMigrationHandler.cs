@@ -15,67 +15,58 @@ using uSync.Migrations.Services;
 namespace uSync.Migrations.Handlers.Seven;
 
 internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContentTypeBaseHandler<TEntity>
-    where TEntity : ContentTypeBase
-{
-    public ContentTypeBaseMigrationHandler(
-        IEventAggregator eventAggregator,
-        ISyncMigrationFileService migrationFileService,
-        ILogger<ContentTypeBaseMigrationHandler<TEntity>> logger,
-        IDataTypeService dataTypeService)
-        : base(eventAggregator, migrationFileService, logger, dataTypeService)
-    { }
+    where TEntity : ContentTypeBase {
+  public ContentTypeBaseMigrationHandler(
+      IEventAggregator eventAggregator,
+      ISyncMigrationFileService migrationFileService,
+      ILogger<ContentTypeBaseMigrationHandler<TEntity>> logger,
+      IDataTypeService dataTypeService )
+      : base( eventAggregator, migrationFileService, logger, dataTypeService ) { }
 
-    protected override (string alias, Guid key) GetAliasAndKey(XElement source)
-        => (
-            alias: source.Element("Info")?.Element("Alias")?.ValueOrDefault(string.Empty) ?? string.Empty,
-            key: source.Element("Info")?.Element("Key")?.ValueOrDefault(Guid.Empty) ?? Guid.Empty
-        );
+  protected override (string alias, Guid key) GetAliasAndKey( XElement source )
+      => (
+          alias: source.Element( "Info" )?.Element( "Alias" )?.ValueOrDefault( string.Empty ) ?? source.Attribute( "Alias" )?.ValueOrDefault( string.Empty ) ?? string.Empty,
+          key: source.Element( "Info" )?.Element( "Key" )?.ValueOrDefault( Guid.Empty ) ?? source.Attribute( "Key" )?.ValueOrDefault( Guid.Empty ) ?? Guid.Empty
+      );
 
-    protected override void UpdateTabs(XElement source, XElement target, SyncMigrationContext context)
-    {
-        var tabs = source.Element("Tabs");
-     var key = source.Element( "Info" )?.Element( "Key" );
-        if (tabs != null && key != null)
-        {
-            var newTabs = new XElement("Tabs");
-            foreach (var tab in tabs.Elements("Tab"))
-            {
-                var newTab = XElement.Parse(tab.ToString());
-                newTab = UpdateTab(newTab, context, key.Value);
-                if (newTab != null) newTabs.Add(newTab);
-            }
-            target.Add(newTabs);
-        }
+  protected override void UpdateTabs( XElement source, XElement target, SyncMigrationContext context ) {
+    var tabs = source.Element( "Tabs" );
+    var key = source.Element( "Info" )?.Element( "Key" )?.ValueOrDefault( Guid.Empty ) ?? source.Attribute( "Key" )?.ValueOrDefault( Guid.Empty ) ?? Guid.Empty;
+    if ( tabs != null && key != Guid.Empty ) {
+      var newTabs = new XElement( "Tabs" );
+      foreach ( var tab in tabs.Elements( "Tab" ) ) {
+        var newTab = XElement.Parse( tab.ToString() );
+        newTab = UpdateTab( newTab, context, key.ToString() );
+        if ( newTab != null ) newTabs.Add( newTab );
+      }
+      target.Add( newTabs );
     }
+  }
 
-    protected override void UpdatePropertyXml(XElement newProperty, SyncMigrationContext context, string contentTypeGuid )
-    {
-        newProperty.Add(new XElement("MandatoryMessage", string.Empty));
-        newProperty.Add(new XElement("ValidationRegExpMessage", string.Empty));
-        newProperty.Add(new XElement("LabelOnTop", false));
+  protected override void UpdatePropertyXml( XElement newProperty, SyncMigrationContext context, string contentTypeGuid ) {
+    newProperty.Add( new XElement( "MandatoryMessage", string.Empty ) );
+    newProperty.Add( new XElement( "ValidationRegExpMessage", string.Empty ) );
+    newProperty.Add( new XElement( "LabelOnTop", false ) );
 
-        var tabNode = newProperty.Element("Tab");
-    UpdateTab(tabNode, context, contentTypeGuid );
+    var tabNode = newProperty.Element( "Tab" );
+    UpdateTab( tabNode, context, contentTypeGuid );
+  }
+
+  internal XElement? UpdateTab( XElement tab, SyncMigrationContext context, string contentTypeGuid ) {
+    var renamedTabs = context.GetChangedTabs();
+
+    var caption = tab.Element( "Caption" ).ValueOrDefault( tab.ValueOrDefault( string.Empty ) );
+    var alias = caption.Replace( " ", "" ).ToFirstLower();
+    var deleteTab = false;
+
+    if ( renamedTabs.Select( x => x.OriginalName ).Contains( caption ) ) {
+      var tabMatch = renamedTabs.Where( x => x.OriginalName == caption ).FirstOrDefault();
+      if ( tabMatch != null ) {
+        if ( string.IsNullOrWhiteSpace( tabMatch.NewName ) ) deleteTab = true;
+        alias = !string.IsNullOrWhiteSpace( tabMatch.Alias ) ? tabMatch.Alias : tabMatch.NewName;
+        caption = tabMatch.NewName;
+      }
     }
-
-    internal XElement? UpdateTab(XElement tab, SyncMigrationContext context, string contentTypeGuid)
-    {
-        var renamedTabs = context.GetChangedTabs();
-
-        var caption = tab.Element("Caption").ValueOrDefault(tab.ValueOrDefault(string.Empty));
-        var alias = caption.Replace(" ", "").ToFirstLower();
-        var deleteTab = false;
-
-        if (renamedTabs.Select(x => x.OriginalName).Contains(caption))
-        {
-            var tabMatch = renamedTabs.Where(x => x.OriginalName == caption).FirstOrDefault();
-            if (tabMatch != null)
-            {
-                if (string.IsNullOrWhiteSpace(tabMatch.NewName)) deleteTab = true;
-                alias = !string.IsNullOrWhiteSpace(tabMatch.Alias) ? tabMatch.Alias : tabMatch.NewName;
-                caption = tabMatch.NewName;
-            }
-        }
 
     if ( !deleteTab ) {
       if ( tab.Element( "Key" ) == null ) {
@@ -88,77 +79,104 @@ internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContent
       }
       tab.SetAttributeValue( "Alias", alias );
 
-      if ( tab.Element( "Alias" ) == null ){ 
+      if ( tab.Element( "Alias" ) == null ) {
         tab.Add( new XElement( "Alias", alias ) );
+      }
+      tab.SetAttributeValue( "Type", "Tab" );
+      if ( tab.Element( "Type" ) == null ) {
+        tab.Add( new XElement( "Type", "Tab" ) );
+      }
+      return tab;
     }
-      tab.SetAttributeValue("Type", "Tab");
-            return tab;
+    return null;
+  }
+
+  /// <summary>
+  ///  update the info section, with the new things that are in v8+ that have no equivalent in v7
+  /// </summary>
+  protected override void UpdateInfoSection( XElement? info, XElement target, Guid key, SyncMigrationContext context ) {
+    if ( info == null ) return;
+
+    var targetInfo = XElement.Parse( info.ToString() );
+    targetInfo.Element( "Key" )?.Remove();
+    targetInfo.Element( "Alias" )?.Remove();
+
+    targetInfo.Add( new XElement( "Variations", "Nothing" ) );
+    targetInfo.Add( new XElement( "IsElement", context.ContentTypes.IsElementType( key ) ) );
+
+    target.Add( targetInfo );
+  }
+
+  /// <summary>
+  ///  update the structure (allowed nodes)
+  /// </summary>
+  protected override void UpdateStructure( XElement source, XElement target ) {
+    var sourceStructure = source.Element( "Structure" );
+
+    if ( sourceStructure != null ) {
+      var i = 0;
+      var transformedStructure = new XElement( "Structure" );
+      foreach ( var element in sourceStructure.Elements() ) {
+        var contentType = new XElement( "ContentType" );
+        contentType.SetAttributeValue( "Key", element?.Attribute( "Key" )?.Value );
+        contentType.SetAttributeValue( "SortOrder", i );
+        contentType.Value = element.Value;
+
+        transformedStructure.Add( contentType );
+        i++;
+      }
+      target.Add( XElement.Parse( transformedStructure.ToString() ) );
+    }
+  }
+
+  protected override void CheckVariations( XElement target, SyncMigrationContext context ) {
+    if ( target.Element( "Info" ) == null ) return;
+
+    var contentTypeVariations = "Nothing";
+
+    var properties = target.Element( "GenericProperties" );
+    if ( properties != null ) {
+      foreach ( var property in properties.Elements( "GenericProperty" ) ) {
+        var variations = property.Element( "Variations" ).ValueOrDefault( string.Empty );
+        if ( variations != "Nothing" ) {
+          contentTypeVariations = variations;
+          break;
         }
-        return null;
+      }
     }
 
-    /// <summary>
-    ///  update the info section, with the new things that are in v8+ that have no equivalent in v7
-    /// </summary>
-    protected override void UpdateInfoSection(XElement? info, XElement target, Guid key, SyncMigrationContext context)
-    {
-        if (info == null) return;
-
-        var targetInfo = XElement.Parse(info.ToString());
-        targetInfo.Element("Key")?.Remove();
-        targetInfo.Element("Alias")?.Remove();
-
-        targetInfo.Add(new XElement("Variations", "Nothing"));
-        targetInfo.Add(new XElement("IsElement", context.ContentTypes.IsElementType(key)));
-
-        target.Add(targetInfo);
-    }
-
-    /// <summary>
-    ///  update the structure (allowed nodes)
-    /// </summary>
-    protected override void UpdateStructure(XElement source, XElement target)
-    {
-        var sourceStructure = source.Element("Structure");
-
-        if (sourceStructure != null)
-        {
-            var i = 0;
-            var transformedStructure = new XElement("Structure");
-            foreach (var element in sourceStructure.Elements())
-            {
-                var contentType = new XElement("ContentType");
-                contentType.SetAttributeValue("Key", element?.Attribute("Key")?.Value);
-                contentType.SetAttributeValue("SortOrder", i);
-                contentType.Value = element.Value;
-
-                transformedStructure.Add(contentType);
-                i++;
-            }
-            target.Add(XElement.Parse(transformedStructure.ToString()));
+    if ( contentTypeVariations == "Nothing" ) {
+      var compositions = target.Element( "Info" )?.Element( "Compositions" );
+      if ( compositions != null ) {
+        foreach ( var composition in compositions.Elements( "Composition" ) ) {
+          string compositionAlias = composition.ValueOrDefault( string.Empty );
+          bool hasVariation = context.ContentTypes.HasVariation( compositionAlias );
+          if ( hasVariation ) {
+            contentTypeVariations = "Culture";
+            break;
+          }
         }
+      }
     }
 
-    protected override void CheckVariations(XElement target)
-    {
-        if (target.Element("Info") == null) return;
+    target.Element( "Info" ).CreateOrSetElement( "Variations", contentTypeVariations );
+  }
 
-        var contentTypeVariations = "Nothing";
+  protected override bool HasVariations( XElement target ) {
+    if ( target.Element( "Info" ) == null ) {
+      return false;
+    }
 
-        var properties = target.Element("GenericProperties");
-        if (properties != null)
-        {
-            foreach (var property in properties.Elements("GenericProperty"))
-            {
-                var variations = property.Element("Variations").ValueOrDefault(string.Empty);
-                if (variations != "Nothing")
-                {
-                    contentTypeVariations = variations;
-                    break;
-                }
-            }
+    var properties = target.Element( "GenericProperties" );
+    if ( properties != null ) {
+      foreach ( var property in properties.Elements( "GenericProperty" ) ) {
+        var variations = property.Element( "Variations" ).ValueOrDefault( string.Empty );
+        if ( variations != "Nothing" ) {
+          return true;
         }
-
-        target.Element("Info").CreateOrSetElement("Variations", contentTypeVariations);
+      }
     }
+
+    return false;
+  }
 }

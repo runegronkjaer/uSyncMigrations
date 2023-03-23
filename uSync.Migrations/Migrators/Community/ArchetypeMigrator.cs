@@ -31,7 +31,7 @@ namespace uSync.Migrations.Migrators.Community {
       if ( fieldsets == null ) {
         _logger.LogWarning( "No settings found for archetype" );
         return new BlockListConfiguration {
-          ValidationLimit = new BlockListConfiguration.NumberRange { Min = 0, Max = 0 },
+          ValidationLimit = new BlockListConfiguration.NumberRange { Min = 0, Max = null },
         };
       }
 
@@ -60,7 +60,10 @@ namespace uSync.Migrations.Migrators.Community {
 
       var validationLimit = fieldsets.MaxFieldsets != null && fieldsets.MaxFieldsets == 1
            ? new BlockListConfiguration.NumberRange { Min = 0, Max = 1 }
-           : new BlockListConfiguration.NumberRange { Min = 0, Max = fieldsets.MaxFieldsets ?? 0 };
+           : new BlockListConfiguration.NumberRange { Min = 0, Max = fieldsets.MaxFieldsets ?? null };
+
+      //TODO: Brug til at oprette content types
+      //context.ContentTypes.AddElementTypes( result.Blocks.Select( x => x.ContentElementTypeKey ), true );
 
       return new BlockListConfiguration {
         Blocks = blocks?.ToArray() ?? Array.Empty<BlockListConfiguration.BlockConfiguration>(),
