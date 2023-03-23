@@ -15,6 +15,7 @@ using uSync.Migrations.Migrators.BlockGrid.BlockMigrators;
 using uSync.Migrations.Migrators.BlockGrid.Extensions;
 using uSync.Migrations.Migrators.BlockGrid.Models;
 using uSync.Migrations.Migrators.Models;
+using static Umbraco.Cms.Core.Models.Property;
 
 namespace uSync.Migrations.Migrators.BlockGrid.Content;
 
@@ -26,7 +27,8 @@ internal class GridToBlockContentHelper {
   private readonly GridConventions _conventions;
   private readonly ILogger<GridToBlockContentHelper> _logger;
   private readonly IContentTypeService _contentTypeService;
-  private IEnumerable<IContentType> AllElemntTypes;
+  private Dictionary<string, Dictionary<string, Guid>>? AllElementTypeDataTypeKeys;
+  private Dictionary<string, IContentType>? AllElementTypes;
 
   public GridToBlockContentHelper(
         GridConventions gridConventions,
@@ -183,10 +185,7 @@ internal class GridToBlockContentHelper {
     }
 
     Guid contentTypeKey = context.ContentTypes.GetKeyByAlias( contentTypeAlias );
-    IContentType? contentType = null;
-    if ( contentTypeKey == Guid.Empty ) {
-      IEnumerable<IContentType> allElemntTypes = GetAllElemntTypes();
-      contentType = allElemntTypes.FirstOrDefault( et => et.Alias.Equals( contentTypeAlias ) );
+    if ( contentTypeKey == Guid.Empty && GetAllElementTypes().TryGetValue( contentTypeAlias, out IContentType?  contentType ) && contentType != null ) {
       contentTypeKey = contentType?.GetUdi().Guid ?? Guid.Empty;
     }
 
@@ -202,45 +201,76 @@ internal class GridToBlockContentHelper {
     };
 
     foreach ( var (gridProperty, value) in blockMigrator.GetPropertyValues( control, context ) ) {
-      //Migrations.Models.EditorAliasInfo? editorAlias = context.ContentTypes.GetEditorAliasByTypeAndProperty( contentTypeAlias, propertyAlias );
-      JToken valueAsToken = (JToken)value;
-      foreach ( JProperty childToken in valueAsToken.Values() ) {
-        string? newDataTypeGuidString = childToken.Value["dataTypeGuid"]?.Value<string>();
-        string? propertyAlias = childToken.Value["editorAlias"]?.Value<string>();
-        string? propertyValue = childToken.Value["value"]?.ToString();
-        string? propertyName = childToken.Value["editorName"]?.Value<string>();
+      try {
+        Migrations.Models.EditorAliasInfo? editorAlias = null;
+        string? propertyValue = null;
+        string? propertyAlias = null;
+        if ( value is JToken valueAsToken ) {
+          foreach ( JProperty childToken in valueAsToken.Values() ) {
+            string? newDataTypeGuidString = childToken.Value["dataTypeGuid"]?.Value<string>();
+            propertyAlias = childToken.Value["editorAlias"]?.Value<string>();
+            propertyValue = childToken.Value["value"]?.ToString();
+            string? propertyName = childToken.Value["editorName"]?.Value<string>();
 
-        if ( Guid.TryParse( newDataTypeGuidString, out Guid newDataTypeGuid ) && !string.IsNullOrEmpty( propertyAlias ) ) {
-          Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
-          string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
-          Migrations.Models.EditorAliasInfo? editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
+            if ( Guid.TryParse( newDataTypeGuidString, out Guid newDataTypeGuid ) && !string.IsNullOrEmpty( propertyAlias ) ) {
+              Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
+              string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
+              editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
 
-          if ( editorAlias != null ) {
 
-            var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
-            if ( migrator != null ) {
-              var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
-              propertyValue = migrator.GetContentValue( property, context );
-              _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
-            } else {
-              _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
             }
           }
+        } else if ( value is string valueAsStr ) {
+          Dictionary<string, Dictionary<string, Guid>> allElementTypes = GetAllElementTypeDataTypeKeys();
+          propertyAlias = gridProperty;
+          propertyValue = valueAsStr;
+          if ( allElementTypes.TryGetValue( contentTypeAlias, out Dictionary<string, Guid>? contentTypeProperties ) && contentTypeProperties?.Any() == true ) {
+            if ( contentTypeProperties.TryGetValue( propertyAlias, out Guid newDataTypeGuid ) ) {
+              Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
+              string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
+              editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
 
+            }
+          }
+        }
+
+        if ( editorAlias != null && !string.IsNullOrEmpty( propertyAlias ) ) {
+
+          var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
+          if ( migrator != null ) {
+            var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
+            propertyValue = migrator.GetContentValue( property, context );
+            _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
+          } else {
+            _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
+          }
           data.RawPropertyValues[propertyAlias] = propertyValue;
         }
+
+      } catch ( Exception ex ) {
+        throw new Exception( $"gridProperty: {gridProperty} - value: {value}", ex );
       }
     }
 
     return data;
   }
 
-  private IEnumerable<IContentType> GetAllElemntTypes() {
-    if ( AllElemntTypes != null ) {
-      return AllElemntTypes;
+  private Dictionary<string, Dictionary<string, Guid>> GetAllElementTypeDataTypeKeys() {
+    if ( AllElementTypeDataTypeKeys != null ) {
+      return AllElementTypeDataTypeKeys;
     }
-    AllElemntTypes = _contentTypeService.GetAllElementTypes();
-    return AllElemntTypes;
+    AllElementTypeDataTypeKeys = GetAllElementTypes().ToDictionary( et => et.Key, et => et.Value.PropertyGroups.SelectMany( pg => pg.PropertyTypes?.ToList() ?? new List<IPropertyType>() ).ToDictionary( pt => pt.Alias, pt => pt.DataTypeKey ) );
+
+    return AllElementTypeDataTypeKeys;
+  }
+
+  private Dictionary<string, IContentType> GetAllElementTypes() {
+    if ( AllElementTypes != null ) {
+      return AllElementTypes;
+    }
+    AllElementTypes = _contentTypeService.GetAllElementTypes().ToDictionary( et => et.Alias, et => et );
+
+    return AllElementTypes;
   }
 }
 
