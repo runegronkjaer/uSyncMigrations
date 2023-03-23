@@ -99,17 +99,23 @@ internal class GridToBlockGridConfigBlockHelper {
     var referencedEditors = gridBlockContext.AllEditors().ToList();
 
     var allowedContentTypes = new Dictionary<string, Guid[]>();
+    IEnumerable<IGridEditorConfig> editors = gridConfig.EditorsConfig.Editors.Where( x => referencedEditors.Contains( "*" ) || referencedEditors.InvariantContains( x.Alias ) )
+                                                                             .DistinctBy( x => x.Alias )
+                                                                             .ToList(); //ToList for easier debugging
 
-    foreach ( var editor in gridConfig.EditorsConfig.Editors
-        .Where( x => referencedEditors.Contains( "*" ) ||
-        referencedEditors.InvariantContains( x.Alias ) ) ) {
+    foreach ( var editor in editors ) {
       var blocks = editor.ConvertToBlockGridBlocks( context,
           _syncBlockMigrators,
           gridBlockContext.GridBlocksGroup.Key ).ToList();
 
       _logger.LogDebug( "Adding {editor} to block config for {count} blocks", editor.Alias, blocks.Count );
 
-      gridBlockContext.ContentBlocks.AddRange( blocks );
+      foreach ( var block in blocks ) {
+        if ( gridBlockContext.ContentBlocks.Any( cb => cb.ContentElementTypeKey == block.ContentElementTypeKey ) ) {
+          continue;
+        }
+        gridBlockContext.ContentBlocks.Add( block );
+      }
 
       allowedContentTypes[editor.Alias] = blocks.Select( x => x.ContentElementTypeKey ).ToArray();
     }
@@ -130,16 +136,22 @@ internal class GridToBlockGridConfigBlockHelper {
 
     var allowedContentTypes = new Dictionary<string, Guid[]>();
 
-    foreach ( IGridEditorConfig? editor in gridConfig.EditorsConfig.Editors
-        .Where( x => referencedEditors.Contains( "*" ) ||
-        referencedEditors.InvariantContains( x.Alias ) ) ) {
+    IEnumerable<IGridEditorConfig> editors = gridConfig.EditorsConfig.Editors.Where( x => referencedEditors.Contains( "*" ) || referencedEditors.InvariantContains( x.Alias ) )
+                                                                             .DistinctBy( x => x.Alias )
+                                                                             .ToList(); //ToList for easier debugging
+    foreach ( IGridEditorConfig? editor in editors ) {
       List<BlockGridConfiguration.BlockGridBlockConfiguration> blocks = editor.ConvertToBlockGridBlocks( context,
           _syncBlockMigrators,
           Guid.Empty ).ToList();
 
       _logger.LogDebug( "Adding {editor} to block config for {count} blocks", editor.Alias, blocks.Count );
 
-      gridBlockContext.ContentBlocks.AddRange( blocks );
+      foreach ( var block in blocks ) {
+        if ( gridBlockContext.ContentBlocks.Any( cb => cb.ContentElementTypeKey == block.ContentElementTypeKey ) ) {
+          continue;
+        }
+        gridBlockContext.ContentBlocks.Add( block );
+      }
 
       allowedContentTypes[editor.Alias] = blocks.Select( x => x.ContentElementTypeKey ).ToArray();
     }
