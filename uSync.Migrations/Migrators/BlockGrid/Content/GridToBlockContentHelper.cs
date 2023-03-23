@@ -185,7 +185,9 @@ internal class GridToBlockContentHelper {
     }
 
     Guid contentTypeKey = context.ContentTypes.GetKeyByAlias( contentTypeAlias );
-    if ( contentTypeKey == Guid.Empty && GetAllElementTypes().TryGetValue( contentTypeAlias, out IContentType?  contentType ) && contentType != null ) {
+    if ( contentTypeKey == Guid.Empty && GetAllElementTypes().TryGetValue( contentTypeAlias, out IContentType? contentType ) && contentType != null ) {
+      //Some grid elements have been created on the fly by the settings migration and might not be available at this point
+      //Luckily we can get the new content type from Umbraco instead
       contentTypeKey = contentType?.GetUdi().Guid ?? Guid.Empty;
     }
 
@@ -206,6 +208,7 @@ internal class GridToBlockContentHelper {
         string? propertyValue = null;
         string? propertyAlias = null;
         if ( value is JToken valueAsToken ) {
+          //If this is hit we have a LeBlender grid element
           foreach ( JProperty childToken in valueAsToken.Values() ) {
             string? newDataTypeGuidString = childToken.Value["dataTypeGuid"]?.Value<string>();
             propertyAlias = childToken.Value["editorAlias"]?.Value<string>();
@@ -216,11 +219,10 @@ internal class GridToBlockContentHelper {
               Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
               string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
               editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
-
-
             }
           }
         } else if ( value is string valueAsStr ) {
+          //This is the default grid elements
           Dictionary<string, Dictionary<string, Guid>> allElementTypes = GetAllElementTypeDataTypeKeys();
           propertyAlias = gridProperty;
           propertyValue = valueAsStr;
