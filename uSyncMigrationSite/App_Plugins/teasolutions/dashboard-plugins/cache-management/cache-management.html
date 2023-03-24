@@ -1,0 +1,18 @@
+﻿<div ng-controller="TeaSolutions.CacheManagementController">
+  <p>
+    The cache was last cleared: {{lastClear}}
+  </p>
+  <button ng-disabled="loading" ng-click="clearCache()" class="btn btn-primary">Clear cache</button>
+
+  <p style="margin-top: 40px;">
+    The destinations was last updated: {{lastUpdated}}<br />
+    <span ng-if="updateStarted">Manual update started: {{updateStarted}}</span>
+  </p>
+  <button ng-disabled="loading" ng-click="updateDestinations()" class="btn btn-primary">Update destinations</button>
+
+  <p style="margin-top:40px;">
+    Generate file with allotments. If clicked, please wait to navigate away from here until download is complete:
+  </p>
+  <a href="/umbraco/surface/exportsheets/downloadallotmentsheets/" class="btn btn-primary">All</a>
+  <a href="/umbraco/surface/exportsheets/downloadallotmentsheets/?currentAllotments=true" class="btn btn-primary">Currently in database</a>
+</div>
