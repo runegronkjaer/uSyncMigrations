@@ -5,11 +5,11 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uSync.Migrations", "uSync.Migrations\uSync.Migrations.csproj", "{1268A5AE-2ECF-4E11-BF73-676EE8989003}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uSyncMigrationSite", "uSyncMigrationSite\uSyncMigrationSite.csproj", "{56873F94-D27F-4695-90AE-A2BA7A2DF94B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyMigrations", "MyMigrations\MyMigrations.csproj", "{E8B3C577-70BE-4270-BFB6-DB3C5C3AA01B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uSync.Migrations.Tests", "uSync.Migrations.Tests\uSync.Migrations.Tests.csproj", "{1A825499-0129-48D6-BF2D-767E7236FE86}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eForsyning", "eForsyning\eForsyning.csproj", "{7DB56315-EE18-4FBC-8D52-D20236B9D096}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{1268A5AE-2ECF-4E11-BF73-676EE8989003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1268A5AE-2ECF-4E11-BF73-676EE8989003}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1268A5AE-2ECF-4E11-BF73-676EE8989003}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56873F94-D27F-4695-90AE-A2BA7A2DF94B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56873F94-D27F-4695-90AE-A2BA7A2DF94B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56873F94-D27F-4695-90AE-A2BA7A2DF94B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56873F94-D27F-4695-90AE-A2BA7A2DF94B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E8B3C577-70BE-4270-BFB6-DB3C5C3AA01B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E8B3C577-70BE-4270-BFB6-DB3C5C3AA01B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8B3C577-70BE-4270-BFB6-DB3C5C3AA01B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{1A825499-0129-48D6-BF2D-767E7236FE86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A825499-0129-48D6-BF2D-767E7236FE86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A825499-0129-48D6-BF2D-767E7236FE86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DB56315-EE18-4FBC-8D52-D20236B9D096}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DB56315-EE18-4FBC-8D52-D20236B9D096}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DB56315-EE18-4FBC-8D52-D20236B9D096}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DB56315-EE18-4FBC-8D52-D20236B9D096}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
