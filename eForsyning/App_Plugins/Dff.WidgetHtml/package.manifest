@@ -1,0 +1,17 @@
+﻿{
+  "propertyEditors": [{ 
+    "alias": "Dff.WidgetHtml",
+    "name": "Widget WebComponent html",
+    "editor": {
+      "view": "~/App_Plugins/Dff.WidgetHtml/widget-html.html",
+      "valueType": "JSON",
+      "hideLabel": false
+    }
+  }],
+  "javascript": [
+    "~/App_Plugins/Dff.WidgetHtml/widget-html.controller.js"
+  ],
+  "css": [
+    "~/App_Plugins/Dff.WidgetHtml/widget-html.css"
+  ] 
+}

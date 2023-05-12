@@ -1,0 +1,25 @@
+﻿<div>
+    <h1>DFF|EDB Admin Dashboard</h1>
+</div>
+<div class="dffedbadmin-dashboard" ng-controller="DffEdbAdminDashboardController as vm">
+    <h3>ForsyningsId der er anvendt mere end én gang.</h3>
+    <ul class="table">
+        <li><strong>Forsynings Navn</strong></li>
+        <li><strong>ForsyningsId</strong></li>
+    </ul>
+    <ul  class="table" ng-repeat="forsyning in vm.forsyningerMedSammeId">
+        <li>{{ forsyning.NodeName }}</li>
+        <li>{{ forsyning.ForsyningsId }}</li>
+    </ul>
+    <hr/>
+    <h3>Forsyninger uden ForsyningsId.</h3>
+    <ul class="table">
+        <li><strong>Forsynings Navn</strong></li>
+    </ul>
+    <ul class="table" ng-repeat="forsyning in vm.forsyningerUdenForsyningsId">
+        <li>{{ forsyning.NodeName }}</li>
+    </ul>
+    <h3>Konvertering af Nyheder til Feed.</h3>
+    <button ng-click="KonverterNyhederTilFeed()" ng-disabled="vm.KonverteringIgang">Kør konvertering</button>
+    <p ng-show="vm.KonverteringFaerdig">Konvertering er færdig</p>
+</div>

@@ -1,0 +1,7 @@
+﻿{
+  "javascript": [
+  ],
+  "css": [
+    "~/App_Plugins/Dff.CssFixes/dffCssFixes.css"
+  ]
+}

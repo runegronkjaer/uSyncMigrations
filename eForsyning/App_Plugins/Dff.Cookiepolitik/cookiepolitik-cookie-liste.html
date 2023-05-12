@@ -1,0 +1,68 @@
+﻿<table class="cookie-tabel" ng-controller="DffCookiepolitikCookieListeController as vm">
+    <tr class="title">
+        <td colspan="2"><h3>Nødvendige cookies</h3></td>
+    </tr>
+    <tr ng-repeat="cookie in vm.cookies.mandatory" class="table-data">
+        <td>
+            <div>
+                <label>Databehandler:</label>
+                <span>{{ cookie.processor }}</span>
+            </div>
+            <div>
+                <label>Navn:</label>
+                <span>{{ cookie.name }}</span>
+            </div>
+            <div ng-if="cookie.domain">
+                <label>Domæne:</label>
+                <span>{{ cookie.domain }}</span>
+            </div>
+            <div>
+                <label>Udløb:</label>
+                <span>{{ cookie.expiry }}</span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <label>Type:</label>
+                <span>{{ cookie.type }}</span>
+            </div>
+            <div>
+                <label>Scannet:</label>
+                <span>{{ cookie.scanTime }}</span>
+            </div>
+        </td>
+    </tr>
+    <tr class="title">
+        <td colspan="2"><h3>Valgfri cookies</h3></td>
+    </tr>
+    <tr ng-repeat="cookie in vm.cookies.optional" class="table-data">
+        <td>
+            <div>
+                <label>Databehandler:</label>
+                <span>{{ cookie.processor }}</span>
+            </div>
+            <div>
+                <label>Navn:</label>
+                <span>{{ cookie.name }}</span>
+            </div>
+            <div ng-if="cookie.domain">
+                <label>Domæne:</label>
+                <span>{{ cookie.domain }}</span>
+            </div>
+            <div>
+                <label>Udløb:</label>
+                <span>{{ cookie.expiry }}</span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <label>Type:</label>
+                <span>{{ cookie.type }}</span>
+            </div>
+            <div>
+                <label>Scannet:</label>
+                <span>{{ cookie.scanTime }}</span>
+            </div>
+        </td>
+    </tr>
+</table>

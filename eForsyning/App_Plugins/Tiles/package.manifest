@@ -1,0 +1,15 @@
+﻿{
+	propertyEditors: [
+		{
+			alias: "DFFEDB.Tiles",
+			name: "Tiles",
+			editor: {
+				view: "~/App_Plugins/Tiles/tiles.html"
+			}
+		}
+	]
+	,
+	javascript: [
+		'~/App_Plugins/Tiles/tiles.controller.js'
+	]
+}

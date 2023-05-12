@@ -1,0 +1,39 @@
+﻿<div class="driftsstatus-overlay" ng-controller="DffDriftsstatusOverlayController as vm">
+    <div>
+        <umb-property property="model.value.forsyningId">
+            <umb-editor model="model.value.forsyningId"></umb-editor>
+        </umb-property>
+
+        <umb-property property="model.value.forsyningType">
+            <umb-editor model="model.value.forsyningType"></umb-editor>
+        </umb-property>
+
+        <umb-property property="model.value.overskrift">
+            <umb-editor model="model.value.overskrift"></umb-editor>
+        </umb-property>
+
+        <umb-property property="model.value.besked">
+            <umb-editor model="model.value.besked"></umb-editor>
+        </umb-property>
+
+        <umb-property property="model.value.fraDato">
+            <umb-editor model="model.value.fraDato"></umb-editor>
+        </umb-property>
+
+        <umb-property property="model.value.tilDato">
+            <umb-editor model="model.value.tilDato"></umb-editor>
+        </umb-property>
+
+        <umb-property property="model.value.kritisk">
+            <umb-editor model="model.value.kritisk"></umb-editor>
+        </umb-property>
+    </div>
+    <div style="padding-top: 30px;" ng-show="(model.value.id)">
+        <umb-button
+            action="vm.afslutStatus(model);"
+            type="button"
+            button-style="danger"
+            label="Marker som afsluttet">
+        </umb-button>
+    </div>
+</div>

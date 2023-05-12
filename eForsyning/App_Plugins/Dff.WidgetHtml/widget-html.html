@@ -1,0 +1,14 @@
+﻿<pre ng-controller="DffHtmlWidgetController as vm">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;script src={{vm.url}}/dist/web-components/v1/polyfills-es2015.js type="module"&gt;&lt;/script&gt;
+        &lt;script src={{vm.url}}/dist/web-components/v1/polyfills-es5.js nomodule defer&gt;&lt;/script&gt;
+        &lt;script src={{vm.url}}/dist/web-components/v1/main-es2015.js type="module"&gt;&lt;/script&gt;
+        &lt;script src={{vm.url}}/dist/web-components/v1/main-es5.js nomodule defer&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;{{vm.widgetSelector}} node-id="{{vm.nodeId}}"&gt;&lt;/{{vm.widgetSelector}}&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</pre>

@@ -1,0 +1,94 @@
+﻿<div ng-controller="Dff.Overlays.LinkPickerController">
+    <umb-control-group label="@content_urls">
+        <input type="text"
+               localize="placeholder"
+               placeholder="@general_url"
+               class="umb-editor umb-textstring"
+               ng-model="model.target.url"
+               ng-disabled="model.target.id"
+               focus-when="{{true}} " />
+    </umb-control-group>
+    <umb-control-group label="@content_nodeName">
+        <input type="text"
+               localize="placeholder"
+               placeholder="@placeholders_entername"
+               class="umb-editor umb-textstring"
+               ng-model="model.target.name" />
+    </umb-control-group>
+
+    <umb-control-group label="Beskrivelse">
+        <textarea
+               placeholder="Indtast evt. beskrivelse..."
+               class="umb-editor umb-textstring"
+               ng-model="model.target.description">
+        </textarea>
+    </umb-control-group>
+
+    <umb-control-group label="Ikon">
+        <select ng-model="model.target.userIcon" class="umb-editor" style="font-family: 'FontAwesome', 'Helvetica';">
+            <option ng-selected="item.value==model.target.userIcon" ng-repeat="item in icons" ng-bind-html="item.label" value="{{item.value}}" style="width:20px;">{{item.label}}</option>
+        </select>
+    </umb-control-group>
+
+
+    <umb-control-group label="@content_target">
+        <label class="checkbox no-indent">
+            <input type="checkbox" ng-model="model.target.target" ng-true-value="_blank" ng-false-value="" /> <localize key="defaultdialogs_openInNewWindow">Opens the linked document in a new window or tab</localize>
+        </label>
+    </umb-control-group>
+
+    <umb-editor model="mediaPicker" ng-show="true"></umb-editor>
+
+    <!--<a href ng-click="switchToMediaPickerImage()" class="btn">
+        <localize key="defaultdialogs_selectMedia">Select media</localize>
+    </a>-->
+
+    <div class="umb-control-group">
+        <h5>
+            <localize key="defaultdialogs_linkToPage">Link to page</localize>
+        </h5>
+        <div ng-hide="miniListView">
+            <umb-tree-search-box hide-search-callback="hideSearch"
+                                 search-callback="onSearchResults"
+                                 search-from-id="{{searchInfo.searchFromId}}"
+                                 search-from-name="{{searchInfo.searchFromName}}"
+                                 show-search="{{searchInfo.showSearch}}"
+                                 section="{{section}}">
+            </umb-tree-search-box>
+            <br />
+            <umb-tree-search-results ng-if="searchInfo.showSearch"
+                                     results="searchInfo.results"
+                                     select-result-callback="selectResult">
+            </umb-tree-search-results>
+            <div ng-hide="searchInfo.showSearch">
+                <umb-tree section="content"
+                          hideheader="true"
+                          hideoptions="true"
+                          eventhandler="dialogTreeEventHandler"
+                          enablelistviewexpand="true"
+                          isdialog="true"
+                          enablecheckboxes="true">
+                </umb-tree>
+            </div>
+        </div>
+        <umb-mini-list-view ng-if="miniListView"
+                            node="miniListView"
+                            entity-type="Document"
+                            on-select="selectListViewNode(node)"
+                            on-close="closeMiniListView()">
+        </umb-mini-list-view>
+    </div>
+    <div class="umb-control-group">
+        <h5>
+            <localize key="defaultdialogs_linkToMedia">Link to media</localize>
+        </h5>
+        <a href ng-click="switchToMediaPicker()" class="btn">
+            <localize key="defaultdialogs_selectMedia">Select media</localize>
+        </a>
+    </div>
+    <umb-overlay ng-if="mediaPickerOverlay.show"
+                 model="mediaPickerOverlay"
+                 view="mediaPickerOverlay.view"
+                 position="right">
+    </umb-overlay>
+</div>

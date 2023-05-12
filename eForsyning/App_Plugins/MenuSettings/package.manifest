@@ -1,0 +1,15 @@
+{
+	propertyEditors: [
+		{
+			alias: "DFFEDB.MenuSettings",
+			name: "Menu Settings",
+			editor: {
+				view: "~/App_Plugins/MenuSettings/menusettings.html"
+			}
+		}
+	]
+	,
+	javascript: [
+		'~/App_Plugins/MenuSettings/menusettings.controller.js'
+	]
+}

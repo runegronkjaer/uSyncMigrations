@@ -1,0 +1,12 @@
+﻿<div class="umb-editor umb-radiobuttons" ng-controller="Dff.PaddingPickerRight.Controller">
+    <ul class="unstyled" ng-init="model.paddingRight=GetPaddingValuesRight()">
+        <li ng-repeat="item in model.paddingRight.data">
+            <label class="radio">
+                <input type="radio" name="radiobuttons-{{model.alias}}"
+                       value="{{item.Value}}"
+                       ng-model="model.value" />
+                {{item.Name}}
+            </label>
+        </li>
+    </ul>
+</div>  

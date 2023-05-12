@@ -1,0 +1,15 @@
+﻿{
+	propertyEditors: [
+		{
+			alias: "DFFEDB.LoginSettings",
+			name: "Login Settings",
+			editor: {
+				view: "~/App_Plugins/LoginSettings/loginSettings.html"
+			}
+		}
+	]
+	,
+	javascript: [
+		'~/App_Plugins/LoginSettings/loginSettings.controller.js'
+	]
+}

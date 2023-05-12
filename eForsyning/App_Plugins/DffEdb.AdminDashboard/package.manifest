@@ -1,0 +1,12 @@
+{
+  "javascript": [
+    /*javascript files listed here*/
+    "~/app_plugins/DffEdb.AdminDashboard/DffEdbAdminDashboard.Controller.js",
+    "~/app_plugins/DffEdb.AdminDashboard/Konvertering/DffEdbAdminDashboardKonvertering.Controller.js",
+    "~/app_plugins/DffEdb.AdminDashboard/WidgetOverblik/DffEdbAdminDashboardWidgetOverblik.Controller.js"
+  ],
+  "css": [
+    /*list of stylesheets appear here:*/
+    "~/app_plugins/DffEdb.AdminDashboard/DffEdbAdminDashboard.css"
+  ]
+}

@@ -1,0 +1,14 @@
+﻿{
+   "propertyEditors": [{ 
+      "alias": "Dff.SelfService",
+      "name": "DFF-EDB Self Service Picker",
+    "editor": {
+      "view": "~/App_Plugins/Dff.SelvbetjeningsPicker/selvbetjening.html?3",
+      "hideLabel": false
+    }
+   }],
+  javascript: [
+    "~/App_Plugins/Dff.SelvbetjeningsPicker/dff.selvbetjening.Controller.js",
+    "~/App_Plugins/Dff.SelvbetjeningsPicker/dff.selvbetjening.Resource.js"
+  ] 
+}

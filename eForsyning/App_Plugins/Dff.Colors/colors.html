@@ -1,0 +1,7 @@
+﻿<div class="seo-metadata-container" ng-controller="Dff.Colors.Controller">
+    <ul class="thumbnails color-picker">
+        <li ng-repeat="color in colors track by $index" ng-class="setActive($index)">
+            <a class="thumbnail xyxx" ng-click="toggleItem($index)" style="background-color:{{color}};" ></a>
+        </li>
+    </ul>
+</div>

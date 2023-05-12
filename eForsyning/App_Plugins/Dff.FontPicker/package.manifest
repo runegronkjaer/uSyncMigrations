@@ -1,0 +1,14 @@
+﻿{
+   "propertyEditors": [{ 
+      "alias": "Dff.FontPicker",
+      "name": "DFF-EDB Font Picker",
+    "editor": {
+      "view": "~/App_Plugins/Dff.FontPicker/fontpicker.html?4",
+      "hideLabel": false,
+      "valueType": "JSON"
+    }
+   }],
+  javascript: [
+    "~/App_Plugins/Dff.FontPicker/dff.FontPicker.Controller.js"
+  ] 
+}

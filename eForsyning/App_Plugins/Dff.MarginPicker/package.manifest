@@ -1,0 +1,10 @@
+﻿{
+  "javascript": [
+    "~/App_Plugins/Dff.MarginPicker/MarginPickerTop.controller.js",
+    "~/App_Plugins/Dff.MarginPicker/MarginPickerBottom.controller.js",
+    "~/App_Plugins/Dff.MarginPicker/PaddingPickerTop.controller.js",
+    "~/App_Plugins/Dff.MarginPicker/PaddingPickerBottom.controller.js",
+    "~/App_Plugins/Dff.MarginPicker/PaddingPickerLeft.controller.js",
+    "~/App_Plugins/Dff.MarginPicker/PaddingPickerRight.controller.js"
+  ]
+}

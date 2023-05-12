@@ -1,0 +1,11 @@
+﻿<div class="color-text" ng-controller="Dff.ColorPaletteText.Controller">
+    <span ng-show="false" class="alert alert-warning">Du skal vælge en palette og gemme før du kan vælge tekstfarver !!</span>
+    <ul class="list-unstyled">
+        <li ng-repeat="color in colors  track by $index">
+            <div style="background-color:{{color.Color}};"></div>
+            <label ng-repeat="textcolor in color.TextColors">
+                <input  type="radio" name="text{{$parent.$index}}" ng-model="model.value[$parent.$index]" value="{{textcolor}}" /> {{textcolor}}
+            </label>
+         </li>
+    </ul>
+</div>

@@ -1,0 +1,20 @@
+﻿<div ng-controller="DffDriftsstatusController as vm">
+    <umb-overlay ng-if="vm.overlay.show"
+                 model="vm.overlay"
+                 view="vm.overlay.view"
+                 position="right">
+    </umb-overlay>
+    
+    <umb-button action="vm.openOverlay()"
+                type="button"
+                button-style="success"
+                label="Opret driftsstatus">
+    </umb-button>
+
+    <umb-content-grid
+        content="vm.driftsstatusser"
+        content-properties="vm.gridTileProperties"
+        on-click="vm.openOverlay">
+    </umb-content-grid>
+    
+</div>

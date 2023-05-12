@@ -1,0 +1,32 @@
+﻿{
+  "propertyEditors": [
+    {
+      "alias": "Dff.LinkPicker",
+      "name": "DFF-EDB link Picker",
+      "editor": {
+        "view": "~/App_Plugins/Dff.LinkPicker/LinkPicker.html?3",
+        "hideLabel": false,
+        "valueType": "JSON"
+      },
+      "prevalues": {
+        "fields": [
+          {
+            "label": "Min number of items",
+            "description": "",
+            "key": "minNumberOfItems",
+            "view": "number"
+          },
+          {
+            "label": "Max number of items",
+            "description": "",
+            "key": "maxNumberOfItems",
+            "view": "number"
+          }
+        ]
+      }
+    }
+  ],
+  "javascript": [
+    "~/App_Plugins/Dff.LinkPicker/LinkPicker.controller.js?1"
+  ]
+}

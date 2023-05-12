@@ -1,0 +1,23 @@
+﻿<div ng-controller="Dff.GoogleFont.Controller">
+
+    <div ng-hide="load">Loading google web fonts...</div>
+
+    <div ng-show="load" ng-repeat="node in model.value track by $index">
+        <div class="span6">
+            <h4>Google Fonts</h4>
+            <select ng-model="node.oGoogleFont.family" class="size" ng-change="showFontPreview(node, false)" ng-options="font.family as font.family for font in fonts"></select>
+        </div>
+        <div class="span6">
+            <h4>Varianter</h4>
+            <select ng-model="node.oVariant" class="size" ng-change="showFontPreview(node, true)" ng-options="variant for variant in node.oVariants"></select>
+        </div>
+        <div class="span12">
+            <div class="google-font-main">
+                <h4>Preview</h4>
+                <span class="show" ng-style="setStyleVariant(node.oGoogleFont.family, node.oSize, node.oVariant, node.oColor.rgba, node.oFontFamily, node.oLineHeight)">The quick brown fox jumps over the lazy dog.</span>
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,19 @@
+﻿{
+  "propertyEditors": [
+    {
+      "alias": "Dff.ColorPaletteText",
+      "name": "DFF-EDB Color Palette Text",
+      "editor": {
+        "view": "~/App_Plugins/Dff.ColorPaletteText/colorPaletteText.html",
+        "hideLabel": false
+      }
+    }
+  ],
+  "javascript": [
+    "~/App_Plugins/Dff.ColorPaletteText/dff.ColorPaletteText.Controller.js",
+    "~/App_Plugins/Dff.ColorPaletteText/dff.ColorPaletteText.Resource.js"
+  ],
+  "css": [
+    "~/App_Plugins/Dff.ColorPaletteText/colorPaletteText.css"
+  ]
+}

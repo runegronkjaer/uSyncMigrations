@@ -1,0 +1,19 @@
+﻿{
+  "propertyEditors": [{ 
+    "alias": "Dff.Driftsstatus",
+    "name": "DFF-EDB Driftsstatus",
+    "editor": {
+      "view": "~/App_Plugins/Dff.Driftsstatus/driftsstatus-liste.html",
+      "hideLabel": false
+    }
+  }],
+  "javascript": [
+    "~/App_Plugins/Dff.Driftsstatus/dff-picker-builder.js",
+    "~/App_Plugins/Dff.Driftsstatus/driftsstatus-edit.controller.js",
+    "~/App_Plugins/Dff.Driftsstatus/driftsstatus-liste.controller.js",
+    "~/App_Plugins/Dff.Driftsstatus/driftsstatus.repository.js"
+  ],
+  "css": [
+    "~/App_Plugins/Dff.Driftsstatus/driftsstatus-edit.css"
+  ] 
+}

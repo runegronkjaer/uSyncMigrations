@@ -1,0 +1,18 @@
+﻿{
+  "propertyEditors": [{ 
+    "alias": "Dff.Cookiepolitik.CookieListe",
+    "name": "DFF|EDB Cookiepolitik - Scannede cookies",
+    "editor": {
+      "view": "~/App_Plugins/Dff.Cookiepolitik/cookiepolitik-cookie-liste.html",
+      "valueType": "JSON",
+      "hideLabel": false
+    }
+  }],
+  "javascript": [
+    "~/App_Plugins/Dff.Cookiepolitik/cookiepolitik-cookie-liste.controller.js",
+    "~/App_Plugins/Dff.Cookiepolitik/cookiepolitik.repository.js"
+  ],
+  "css": [
+    "~/App_Plugins/Dff.Cookiepolitik/cookiepolitik-cookie-liste.css"
+  ] 
+}

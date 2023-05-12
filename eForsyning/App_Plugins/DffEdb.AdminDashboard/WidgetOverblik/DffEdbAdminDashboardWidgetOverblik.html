@@ -1,0 +1,16 @@
+﻿<div class="dffedbadmin-dashboard--widgets" ng-controller="DffEdbAdminDashboardWidgetOverblikController as vm">
+    <h3>Widgets</h3>
+    <p>
+        <button *ng-if="!vm.widgets" ng-click="vm.fetch()">Hent data</button>&nbsp;{{vm.tid}}
+    </p>    
+    <p>
+        <button *ng-if="!vm.widgets" ng-click="vm.fetchViaSql()">Hent data via SQL</button>&nbsp;{{vm.tidSql}}
+    </p>
+
+    <div class="dff-processing" ng-show="vm.loader">Henter data...</div>
+
+    <details ng-repeat="widget in vm.widgets">
+        <summary>{{widget.WidgetTypeName}} ({{widget.Sites.length}})</summary>
+        <ul><li ng-repeat="site in widget.Sites">{{site.SiteName}} <small>({{site.PageNames}})</small></li></ul>
+    </details>
+</div>

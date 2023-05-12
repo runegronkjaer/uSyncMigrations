@@ -1,0 +1,23 @@
+﻿{
+  "propertyEditors": [
+    {
+      "alias": "Dff.FormEditor",
+      "name": "DFF-EDB Form Editor",
+      "editor": {
+        "view": "~/App_Plugins/Dff.FormEditor/formeditor.html?4",
+        "hideLabel": false,
+        "valueType": "JSON"
+      }
+    }
+  ],
+  "javascript": [
+    "~/App_Plugins/Dff.FormEditor/FormEditor.Elements.controller.js",
+    "~/App_Plugins/Dff.FormEditor/FormEditor.Templates.controller.js",
+    "~/App_Plugins/Dff.FormEditor/FormEditor.Templates.resource.js",
+    "~/App_Plugins/Dff.FormEditor/FormEditor.controller.js",
+    "~/App_Plugins/Dff.FormEditor/FormEditor.resource.js"
+  ],
+  "css": [
+    "~/App_Plugins/Dff.FormEditor/FormEditor.css?1"
+  ]
+}

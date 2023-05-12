@@ -1,0 +1,23 @@
+﻿.list-picker .selectable .button,
+.list-picker .selected .button {
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    text-decoration: none;
+}
+
+.button.blue {
+    color: #2e8aea;
+}
+
+.button.red {
+    color: #fe3e39;
+}
+
+.mce-fullscreen .mce-tinymce {
+    z-index: 999;
+}
+
+.mce-fullscreen #leftcolumn {
+    display: none;
+}

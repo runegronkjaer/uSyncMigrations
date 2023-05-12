@@ -1,0 +1,83 @@
+﻿<div ng-controller="DFFEDB.Tiles">
+    <fieldset>
+        <label for="tileOverskrift1">Overskrift for Tile 1..:</label>
+        <input id="tileOverskrift1" ng-model="model.value.tileOverskrift1"><br /><br />
+        <label for="tileUnderOverskrift1">Beskrivelse for Tile 1:</label>
+        <input id="tileUnderOverskrift1" ng-model="model.value.tileUnderOverskrift1"><br /><br />
+        <label for="tileUnderOverskrift1">Vælg link for Tile 1....:</label>
+        <select id="tileVaelg1" ng-model="model.value.tile1">
+            <option value="Budget">Budget (Standard)</option>
+            <option value="Temperatur">Temperatur (Standard)</option>
+            <option value="Vejret">Vejret (Standard)</option>
+            <option value="Mit Forbrug">Mit Forbrug</option>
+            <option value="Mine Dokumenter">Mine Dokumenter</option>
+            <option value="Sammenlign Forbrug">Sammenlign Forbrug</option>
+            <option value="Mine Oplysninger">Mine Oplysninger</option>
+            <option value="Beregnet Varmeregnskab">Beregnet Varmeregnskab</option>
+            <option value="Meld Flytning">Meld Flytning</option>
+            <option value="SMS Service">SMS Service</option>
+            <option value="Kontakt">Kontakt</option>
+            <option value="Indtast Aflæsning">Indtast Aflæsning</option>
+            <option value="Forbrugsoverblik">Forbrugsalarmer</option>
+            <option value="eksternlink">Vælg ekstern link</option>
+        </select><br /><br />
+        <label for="tileExternlink1" ng-show="model.value.tile1 == 'eksternlink'">Ekstern link 1............:</label>
+        <input id="tileExternlink1" ng-show="model.value.tile1 == 'eksternlink'" ng-model="model.value.externlink1"><br /><br />
+    </fieldset>
+    <hr />
+    <br />
+    <fieldset>
+        <label for="tileOverskrift2">Overskrift for Tile 2..:</label>
+        <input id="tileOverskrift2" ng-model="model.value.tileOverskrift2"><br /><br />
+        <label for="tileUnderOverskrift2">Beskrivelse for Tile 2:</label>
+        <input id="tileUnderOverskrift2" ng-model="model.value.tileUnderOverskrift2"><br /><br />
+        <label for="tileUnderOverskrift2">Vælg link for Tile 2....:</label>
+        <select id="tileVaelg2" ng-model="model.value.tile2">
+            <option value="Budget">Budget (Standard)</option>
+            <option value="Temperatur">Temperatur (Standard)</option>
+            <option value="Vejret">Vejret (Standard)</option>
+            <option value="Mit Forbrug">Mit Forbrug</option>
+            <option value="Mine Dokumenter">Mine Dokumenter</option>
+            <option value="Sammenlign Forbrug">Sammenlign Forbrug</option>
+            <option value="Mine Oplysninger">Mine Oplysninger</option>
+            <option value="Beregnet Varmeregnskab">Beregnet Varmeregnskab</option>
+            <option value="Meld Flytning">Meld Flytning</option>
+            <option value="SMS Service">SMS Service</option>
+            <option value="Kontakt">Kontakt</option>
+            <option value="Indtast Aflæsning">Indtast Aflæsning</option>
+            <option value="Forbrugsoverblik">Forbrugsalarmer</option>
+            <option value="eksternlink">Vælg ekstern link</option>
+        </select><br /><br />
+        <label for="tileExternlink2" ng-show="model.value.tile2 == 'eksternlink'">Ekstern link 2............:</label>
+        <input id="tileExternlink2" ng-model="model.value.externlink2" ng-show="model.value.tile2 == 'eksternlink'"><br /><br />
+    </fieldset>
+    <hr />
+    <br />
+    <fieldset>
+        <label for="tileOverskrift3">Overskrift for Tile 3..:</label>
+        <input id="tileOverskrift3" ng-model="model.value.tileOverskrift3"><br /><br />
+        <label for="tileUnderOverskrift3">Beskrivelse for Tile 3:</label>
+        <input id="tileUnderOverskrift3" ng-model="model.value.tileUnderOverskrift3"><br /><br />
+        <label for="tileUnderOverskrift3">Vælg link for Tile 3....:</label>
+        <select id="tileVaelg3" ng-model="model.value.tile3">
+            <option value="Budget">Budget (Standard)</option>
+            <option value="Temperatur">Temperatur (Standard)</option>
+            <option value="Vejret">Vejret (Standard)</option>
+            <option value="Mit Forbrug">Mit Forbrug</option>
+            <option value="Mine Dokumenter">Mine Dokumenter</option>
+            <option value="Sammenlign Forbrug">Sammenlign Forbrug</option>
+            <option value="Mine Oplysninger">Mine Oplysninger</option>
+            <option value="Beregnet Varmeregnskab">Beregnet Varmeregnskab</option>
+            <option value="Meld Flytning">Meld Flytning</option>
+            <option value="SMS Service">SMS Service</option>
+            <option value="Kontakt">Kontakt</option>
+            <option value="Indtast Aflæsning">Indtast Aflæsning</option>
+            <option value="Forbrugsoverblik">Forbrugsalarmer</option>
+            <option value="eksternlink">Vælg ekstern link</option>
+        </select><br /><br />
+        <label for="tileExternlink3" ng-show="model.value.tile3 == 'eksternlink'">Ekstern link 3............:</label>
+        <input id="tileExternlink3" ng-model="model.value.externlink3" ng-show="model.value.tile3 == 'eksternlink'"><br /><br />
+    </fieldset>
+    <hr />
+    <br />
+</div>

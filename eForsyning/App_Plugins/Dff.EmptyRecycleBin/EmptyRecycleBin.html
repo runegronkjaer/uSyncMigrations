@@ -1,0 +1,13 @@
+﻿<div ng-controller="Dff.EmptyRecycleBin.Controller">
+    <div class="umb-pane">
+        <umb-load-indicator ng-if="busy">
+        </umb-load-indicator>
+        <p class="umb-abstract">Når elementer slettes fra papirkurven, slettes de for altid. Er du sikker??</p>
+    </div>
+    <div class="umb-pane btn-toolbar umb-btn-toolbar">
+        <div class="control-group umb-control-group">
+            <a href="" class="btn btn-link" ng-click="onCancel()">Fortryd</a>
+            <button class="btn btn-primary" ng-click="onConfirm()" ng-disabled="busy">OK</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+﻿<div ng-controller="Dff.FormEditor.Templates.Controller" class="cell-tools-menu" ng-style="dialogStyles">
+    <h3>Vigtigt</h3>
+    <p>Når du vælger en template, sættes denne ind istedet for den form du har bygget (hvis du har bygget en). Ønsker du <strong>ikke</strong> dette, skal du klikke "Luk/Close" nederst!</p>
+    <form name="overlayForm" ng-submit="submit(model)">
+    <ul class="umb-card-grid">
+        <li ng-repeat="template in templates" class="-three-in-row" ng-click="selectItem(template)">
+            <a class="umb-card-grid-item">
+                <i class="icon-thumbnails-small"></i>
+                {{template.Name}}
+            </a>
+        </li>
+    </ul>
+    </form>
+</div>

@@ -1,0 +1,26 @@
+﻿{
+  "propertyEditors": [
+    {
+      "alias": "Dff.Colors",
+      "name": "DFF-EDB Color Picker",
+      "editor": {
+        "view": "~/App_Plugins/Dff.Colors/colors.html?4",
+        "hideLabel": false
+      },
+      "prevalues": {
+        "fields": [
+          {
+            "label": "Add black and white",
+            "description": "If ticked, black and white will be added til the curent palette",
+            "key": "addColors",
+            "view": "boolean"
+          }
+        ]
+      }
+    }
+  ],
+  javascript: [
+    '~/App_Plugins/Dff.Colors/dff.Colors.Controller.js',
+    '~/App_Plugins/Dff.Colors/dff.Colors.Resource.js'
+  ]
+}

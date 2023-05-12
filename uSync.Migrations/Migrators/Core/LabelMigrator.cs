@@ -11,7 +11,11 @@ public class LabelMigrator : SyncPropertyMigratorBase
     public override string GetEditorAlias(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
         => UmbConstants.PropertyEditors.Aliases.Label;
 
-    public override object GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
+  public override string GetDatabaseType( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context ) {
+    return "Ntext";
+  }
+
+  public override object GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
     {
         return new LabelConfiguration
         {

@@ -1,0 +1,41 @@
+﻿.cookie-tabel {
+}
+
+.cookie-tabel .header {
+    font-weight: bold;
+}
+
+.cookie-tabel td {
+    padding: 8px 2px;
+    border-bottom: 1px dashed silver;
+}
+
+.cookie-tabel tr.table-data td {
+}
+
+.cookie-tabel tr.title td {
+}
+
+.cookie-tabel tr.table-header td {
+    border-top: 1px solid silver;
+    border-bottom: 1px solid silver;
+    border-width: 1px 0;
+    background: #f8f8f8;
+    font-weight: bold;
+}
+
+.cookie-tabel td > div {
+    display: table-row;
+}
+
+.cookie-tabel td > div > label {
+    display: table-cell;
+    color: darkgray;
+    font-size: .8em;
+    font-weight: bold;
+}
+
+.cookie-tabel td > div > span {
+    display: table-cell;
+    padding-left: 4px;
+}

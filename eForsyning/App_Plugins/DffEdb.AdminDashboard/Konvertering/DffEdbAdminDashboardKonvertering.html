@@ -1,0 +1,41 @@
+﻿<div class="dffedbadmin-dashboard dffedbadmin-konverter" ng-controller="DffEdbAdminDashboardKonverteringController as vm">
+    <div class="dff-processing" ng-show="vm.processing">Arbejder...</div>
+    <div class="dff-alert alert-success" ng-show="vm.success">Opgaven er udført med success</div>
+    <div class="dff-alert alert-error" ng-show="vm.error">Opgaven er fejlet</div>
+
+    <hr />
+
+    <h3>Sæt alle værker til at vise driftsstatus i menulinjen</h3>
+    <p>Bør kun køres én gang (når feltet er uploadet til serveren)</p>
+    <button ng-click="vm.brugDriftsstatusPaaAlleVaerker()">Udfør</button>
+
+    <hr />
+
+    <h3>Ny E|Forsyning på Angular 8+</h3>
+    <div>Antal E|Forsyninger på:</div>
+    <table>
+        <tr>
+            <td>Angular 8+:</td>
+            <td><strong>{{ vm.count.nyEforsyning }}</strong></td>
+            <td><button ng-click="vm.konverterAlleSitesTilAngular8()">Konverter alle sites til Angular 8+</button></td>
+        </tr>
+        <tr>
+            <td>AngularJS:</td>
+            <td><strong>{{ vm.count.gammelEforsyning }}</strong></td>
+            <td><button ng-click="vm.konverterAlleSitesTilAngularJS()">Konverter alle sites til AngularJS 1.x</button></td>
+        </tr>
+    </table>
+
+    <hr />
+
+    <h3>Opret Prisberegner- og e-Boks-widgets under alle værker</h3>
+    <p>Kan køres flere gange</p>
+    <button ng-click="vm.tilfojWidgetPaaAlleVaerker()">Udfør</button>
+
+    <hr />
+
+    <h3>Aktiver kampagne til indsamling af kontaktoplysninger under alle E|Forsyninger</h3>
+    <button ng-click="vm.aktiverKontaktoplysningKampagnerPaaAlleEforsyninger()">Udfør</button>
+
+    <hr />
+</div>

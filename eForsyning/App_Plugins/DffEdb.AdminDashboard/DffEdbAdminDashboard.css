@@ -1,0 +1,74 @@
+﻿.dffedbadmin-dashboard ul.table {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.dffedbadmin-dashboard ul.table li {
+    min-width: 300px;
+}
+
+.dff-processing {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dff-alert {
+    padding: 10px 15px;
+}
+
+.dffedbadmin-konverter td button {
+    width: 100%;
+    margin-left: 10px;
+}
+
+
+.dffedbadmin-dashboard--widgets details {
+    transition: margin .2s;
+}
+
+.dffedbadmin-dashboard--widgets details[open] {
+    margin: 10px auto;
+}
+
+.dffedbadmin-dashboard--widgets summary {
+    padding: 5px 8px;
+    border: 1px solid silver;
+    border-bottom: none;
+    background-color: teal;
+    color: white;
+    cursor: pointer;
+}
+
+.dffedbadmin-dashboard--widgets ul {
+    list-style: none;
+    margin: 0;
+    border: 1px solid silver;
+    border-top: none;
+    //margin-bottom: 20px;
+}
+
+.dffedbadmin-dashboard--widgets ul li {
+    padding: 5px 8px;
+    background-color: #f8f8f8;
+}
+
+.dffedbadmin-dashboard--widgets ul li:not(:last-child) {
+    border-bottom: 1px dashed silver;
+}
+
+.dffedbadmin-dashboard--widgets ul li:nth-child(2n) {
+    //background-color: silver;
+}
+
+.dffedbadmin-dashboard--widgets ul li:nth-child(2n+1) {
+    //background-color: cadetblue;
+}
