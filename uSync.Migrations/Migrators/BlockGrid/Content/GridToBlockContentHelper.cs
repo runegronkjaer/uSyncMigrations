@@ -220,6 +220,7 @@ internal class GridToBlockContentHelper {
               string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
               editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
             }
+            AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
           }
         } else if ( value is string valueAsStr ) {
           //This is the default grid elements
@@ -234,6 +235,7 @@ internal class GridToBlockContentHelper {
 
             }
           }
+          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
         }
 
         if ( editorAlias != null && !string.IsNullOrEmpty( propertyAlias ) ) {
@@ -273,6 +275,21 @@ internal class GridToBlockContentHelper {
     AllElementTypes = _contentTypeService.GetAllElementTypes().ToDictionary( et => et.Alias, et => et );
 
     return AllElementTypes;
+  }
+
+  private void AddRawPropertyValues( BlockItemData data, string? propertyAlias, string? propertyValue, Migrations.Models.EditorAliasInfo? editorAlias, SyncMigrationContext context ) {
+    if ( editorAlias != null && !string.IsNullOrEmpty( propertyAlias ) ) {
+
+      var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
+      if ( migrator != null ) {
+        var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
+        propertyValue = migrator.GetContentValue( property, context );
+        _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
+      } else {
+        _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
+      }
+      data.RawPropertyValues[propertyAlias] = propertyValue;
+    }
   }
 }
 
