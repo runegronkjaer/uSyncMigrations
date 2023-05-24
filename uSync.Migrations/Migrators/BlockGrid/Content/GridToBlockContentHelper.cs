@@ -15,7 +15,6 @@ using uSync.Migrations.Migrators.BlockGrid.BlockMigrators;
 using uSync.Migrations.Migrators.BlockGrid.Extensions;
 using uSync.Migrations.Migrators.BlockGrid.Models;
 using uSync.Migrations.Migrators.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using static Umbraco.Cms.Core.Models.Property;
 
 namespace uSync.Migrations.Migrators.BlockGrid.Content;
@@ -221,60 +220,6 @@ internal class GridToBlockContentHelper {
               string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
               editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
             }
-            AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
-          }
-        } else if ( value is string valueAsStr ) {
-          //This is the default grid elements
-          Dictionary<string, Dictionary<string, Guid>> allElementTypes = GetAllElementTypeDataTypeKeys();
-          propertyAlias = gridProperty;
-          propertyValue = valueAsStr;
-          if ( allElementTypes.TryGetValue( contentTypeAlias, out Dictionary<string, Guid>? contentTypeProperties ) && contentTypeProperties?.Any() == true ) {
-            if ( contentTypeProperties.TryGetValue( propertyAlias, out Guid newDataTypeGuid ) ) {
-              Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
-              string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
-              editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
-
-            }
-          }
-          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
-        }
-
-
-
-        var contentTypeKey = context.ContentTypes.GetKeyByAlias(contentTypeAlias);
-        if (contentTypeKey == Guid.Empty)
-        {
-            _logger.LogWarning("Cannot find content type key from alias {alias}", contentTypeAlias);
-            return null;
-        }
-
-        var data = new BlockItemData
-        {
-            Udi = Udi.Create(UmbConstants.UdiEntityType.Element, Guid.NewGuid()),
-            ContentTypeAlias = contentTypeAlias,
-            ContentTypeKey = contentTypeKey
-        };
-
-
-        foreach (var (propertyAlias, value) in blockMigrator.GetPropertyValues(control, context))
-        {
-            var editorAlias = context.ContentTypes.GetEditorAliasByTypeAndProperty(contentTypeAlias, propertyAlias);
-            var propertyValue = value;
-            if (editorAlias != null)
-            {
-
-                var migrator = context.Migrators.TryGetMigrator(editorAlias.OriginalEditorAlias);
-                if (migrator != null)
-                {
-                    var property = new SyncMigrationContentProperty(editorAlias.OriginalEditorAlias, value?.ToString() ?? string.Empty);
-                    propertyValue = migrator.GetContentValue(property, context);
-                    _logger.LogDebug("Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue); 
-                }
-                else
-                {
-                    _logger.LogDebug("No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias);
-                }
-            }
           }
         } else if ( value is string valueAsStr ) {
           //This is the default grid elements
@@ -328,21 +273,6 @@ internal class GridToBlockContentHelper {
     AllElementTypes = _contentTypeService.GetAllElementTypes().ToDictionary( et => et.Alias, et => et );
 
     return AllElementTypes;
-  }
-
-  private void AddRawPropertyValues( BlockItemData data, string? propertyAlias, string? propertyValue, Migrations.Models.EditorAliasInfo? editorAlias, SyncMigrationContext context ) {
-    if ( editorAlias != null && !string.IsNullOrEmpty( propertyAlias ) ) {
-
-      var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
-      if ( migrator != null ) {
-        var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
-        propertyValue = migrator.GetContentValue( property, context );
-        _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
-      } else {
-        _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
-      }
-      data.RawPropertyValues[propertyAlias] = propertyValue;
-    }
   }
 }
 
