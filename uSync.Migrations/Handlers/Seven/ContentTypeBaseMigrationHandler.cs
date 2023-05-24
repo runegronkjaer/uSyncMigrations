@@ -171,7 +171,7 @@ internal abstract class ContentTypeBaseMigrationHandler<TEntity> : SharedContent
     if ( properties != null ) {
       foreach ( var property in properties.Elements( "GenericProperty" ) ) {
         var variations = property.Element( "Variations" ).ValueOrDefault( string.Empty );
-        if ( variations != "Nothing" ) {
+        if ( variations != "Nothing" && variations != "" ) {
           return true;
         }
       }
