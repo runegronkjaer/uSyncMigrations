@@ -236,19 +236,19 @@ internal class GridToBlockContentHelper {
             }
           }
           AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
-        }
-
-        if ( editorAlias != null && !string.IsNullOrEmpty( propertyAlias ) ) {
-
-          var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
-          if ( migrator != null ) {
-            var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
-            propertyValue = migrator.GetContentValue( property, context );
-            _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
-          } else {
-            _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
+        } else if ( value is JToken valueAsToken2 ) {
+          //This is the default grid elements
+          Dictionary<string, Dictionary<string, Guid>> allElementTypes = GetAllElementTypeDataTypeKeys();
+          propertyAlias = gridProperty;
+          propertyValue = valueAsToken2.ToString();
+          if ( allElementTypes.TryGetValue( contentTypeAlias, out Dictionary<string, Guid>? contentTypeProperties ) && contentTypeProperties?.Any() == true ) {
+            if ( contentTypeProperties.TryGetValue( propertyAlias, out Guid newDataTypeGuid ) ) {
+              Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
+              string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
+              editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
+            }
           }
-          data.RawPropertyValues[propertyAlias] = propertyValue;
+          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
         }
 
       } catch ( Exception ex ) {
