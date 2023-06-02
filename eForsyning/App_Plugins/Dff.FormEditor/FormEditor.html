@@ -1,162 +1,161 @@
 ﻿<div class="formeditor-container" ng-controller="Dff.FormEditor.Controller as c">
-        <fieldset>
-            <legend>
-                <h3>
-                    Formular editor
-                </h3>
-            </legend>
-        </fieldset>
+  <fieldset>
+    <legend>
+      <h3>
+        Formular editor
+      </h3>
+    </legend>
+  </fieldset>
 
-        <div class="formeditor-rowconfig">
-            <h4>Tilføj rækker til formularen</h4>
-            <button type="button" class="btn btn-success btn-small" ng-click="addRow(1)">Tilføj række med 1 kolonne</button>
-            <button type="button" class="btn btn-success btn-small" ng-click="addRow(2)">Tilføj række med 2 kolonner</button>
-            <button type="button" class="btn btn-success btn-small" ng-click="addRow(3)">Tilføj række med 3 kolonner</button>
-            <button ng-if="!rowDeleteState" type="button" class="btn btn-info btn-small" ng-click="toogleState()">Slet rækker</button>
-            <button ng-if="rowDeleteState" type="button" class="btn btn-danger btn-small" ng-click="toogleState()">Abryd slet rækker</button>
-        </div>
-    
-        <h4>Formularopbygning</h4>
-    
-        <div ui-sortable="rowsSortableOptions" ng-model="model.value.Rows" class="ui-sortable">
-            <div class="row" ng-repeat="row in model.value.Rows">
-                <button ng-if="rowDeleteState" class="btn btn-danger btn-block" style="float:left;" ng-click="deleteRow(row)">Slet række</button>
-                <div ng-repeat="cell in row.Cells" class="span{{cell.Columns}}">
-                    <div class="formulate-cell ui-sortable" ui-sortable="fieldSortableOptions" ng-model="cell.Elements">
-                        <div ng-if="!rowDeleteState">
-                            <div ng-repeat="element in cell.Elements" class="formulate-cell-field ng-scope ng-binding ui-sortable-handle">
-                                <i class="{{element.Icon}}" title="{{element.Name}}" style="cursor:help;"></i> {{element.Label}}
-                                <span class="formeditor-icons">
-                                    <i ng-class="element.Edit ? 'icon-navigation-up' : 'icon-navigation-down'" ng-click="element.Edit = !element.Edit"></i>
-                                    <i class="icon-delete-key red" ng-click="deleteElement(element)" title="Slet"></i>
-                                </span>
-                                <div class="formeditor-details" ng-if="element.Edit">
-                                    <hr />
-                                    <div class="control-group">
-                                        <label class="control-label">Navn</label>
-                                        <span ng-show="element.Type != 'headline' && element.Type != 'text'">
-                                            <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
-                                        </span>
-                                        <input ng-show="element.Type == 'headline'" type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
-                                        <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
-                                    </div>
-                                    <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
-                                        <label class="control-label">Forklaring</label>
-                                        <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Help" placeholder="Skriv evt. en forklaring til feltet..." />
-                                    </div>
-                                    <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
-                                        <label class="control-label">Skal udfyldes</label>
-                                        <input type="checkbox" class="" ng-model="element.Required" />
-                                    </div>
-                                    <div class="control-group" ng-if="element.Type == 'list'">
-                                        <label class="control-label">Liste type</label>
-                                        <span>
-                                            <label>
-                                                <input type="radio" name="editList" value="dropdown" ng-model="element.ListType" /> Dropdown
-                                            </label>&nbsp;&nbsp;
-                                            <label>
-                                                <input type="radio" name="editList" value="checkbokse" ng-model="element.ListType" /> Checkbokse
-                                            </label>&nbsp;&nbsp;
-                                            <label>
-                                                <input type="radio" name="editList" value="radiobuttons" ng-model="element.ListType" /> Radiobuttons
-                                            </label>
-                                        </span>
-                                    </div>
-                                    <div class="control-group" style="vertical-align:top;" ng-if="element.Type == 'list'">
-                                        <label class="control-label fieldvalues-label" style="vertical-align:top;">Værdier</label>
-                                        <ul ui-sortable="sortableOptions" ng-model="element.Values" class="unstyled fieldvalues">
+  <div class="formeditor-rowconfig">
+    <h4>Tilføj rækker til formularen</h4>
+    <button type="button" class="btn btn-success btn-small" ng-click="addRow(1)">Tilføj række med 1 kolonne</button>
+    <button type="button" class="btn btn-success btn-small" ng-click="addRow(2)">Tilføj række med 2 kolonner</button>
+    <button type="button" class="btn btn-success btn-small" ng-click="addRow(3)">Tilføj række med 3 kolonner</button>
+    <button ng-if="!rowDeleteState" type="button" class="btn btn-info btn-small" ng-click="toogleState()">Slet rækker</button>
+    <button ng-if="rowDeleteState" type="button" class="btn btn-danger btn-small" ng-click="toogleState()">Abryd slet rækker</button>
+  </div>
 
-                                            <li ng-repeat="node in element.Values track by $index">
-                                                <input ng-model="node.Value" type="text" class="form-control">
-                                                <i class="icon icon-add" ng-click="addValue(element.Values, $index)" style="cursor:pointer;"></i>
-                                                <i class="icon icon-delete" ng-click="removeValue(element.Values, $index)" style="cursor:pointer;"></i>
-                                                <i class="icon icon-navigation handle"></i>
-                                            </li>
+  <h4>Formularopbygning</h4>
 
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div ng-if="rowDeleteState">
-                            <div ng-repeat="element in cell.Elements">
-                                {{element.Label}}
-                            </div>
-                    </div>
+  <div ui-sortable="rowsSortableOptions" ng-model="model.value.Rows" class="ui-sortable">
+    <div class="row" ng-repeat="row in model.value.Rows">
+      <button ng-if="rowDeleteState" class="btn btn-danger btn-block" style="float:left;" ng-click="deleteRow(row)">Slet række</button>
+      <div ng-repeat="cell in row.Cells" class="span{{cell.Columns}}">
+        <div class="formulate-cell ui-sortable" ui-sortable="fieldSortableOptions" ng-model="cell.Elements">
+          <div ng-if="!rowDeleteState">
+            <div ng-repeat="element in cell.Elements" class="formulate-cell-field ng-scope ng-binding ui-sortable-handle">
+              <i class="{{element.Icon}}" title="{{element.Name}}" style="cursor:help;"></i> {{element.Label}}
+              <span class="formeditor-icons">
+                <i ng-class="element.Edit ? 'icon-navigation-up' : 'icon-navigation-down'" ng-click="element.Edit = !element.Edit"></i>
+                <i class="icon-delete-key red" ng-click="deleteElement(element)" title="Slet"></i>
+              </span>
+              <div class="formeditor-details" ng-if="element.Edit">
+                <hr />
+                <div class="control-group">
+                  <label class="control-label">Navn</label>
+                  <span ng-show="element.Type != 'headline' && element.Type != 'text'">
+                    <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
+                  </span>
+                  <input ng-show="element.Type == 'headline'" type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
+                  <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
                 </div>
-            </div>
-        </div>
-
-        <h4>Oprettede felter der ikke vises i formularen<br /><small>Træk de ønskede felter til layoutet ovenfor</small></h4>
-
-        <div ng-model="model.value.Unassigned" class="formulate-cell ui-sortable" ui-sortable="fieldSortableOptions">
-            <div class="formulate-cell-field ui-sortable-handle" ng-repeat="element in model.value.Unassigned">
-                <i class="{{element.Icon}}" title="{{element.Name | limitTo:50}}" style="cursor:help;"></i> {{element.Label | limitTo:50 }} 
-                <span class="formeditor-icons">
-                    <i ng-class="element.Edit ? 'icon-navigation-up' : 'icon-navigation-down'" ng-click="element.Edit = !element.Edit"></i>
-                    <i class="icon-arrow-up"></i>
-                    <i class="icon-delete-key red" ng-click="deleteUnassignedElement(element)" title="Slet"></i>
-                </span>
-
-                <div class="formeditor-details" ng-if="element.Edit">
-                    <hr />
-                    <div class="control-group">
-                        <label class="control-label">Navn</label>
-                        <span ng-show="element.Type != 'headline' && element.Type != 'text'">
-                            <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
-                        </span>
-                        <input ng-show="element.Type == 'headline'" type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
-                        <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
-                    </div>
-                    <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
-                        <label class="control-label">Forklaring</label>
-                        <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Help" placeholder="Skriv evt. en forklaring til feltet..." />
-                    </div>
-                    <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
-                        <label class="control-label">Skal udfyldes</label>
-                        <input type="checkbox" class="" ng-model="element.Required" />
-                    </div>
-                    <div class="control-group" ng-if="element.Type == 'list'">
-                        <label class="control-label">Liste type</label>
-                        <span>
-                            <label>
-                                <input type="radio" name="editList" value="dropdown" ng-model="element.ListType" /> Dropdown
-                            </label>&nbsp;&nbsp;
-                            <label>
-                                <input type="radio" name="editList" value="checkbokse" ng-model="element.ListType" /> Checkbokse
-                            </label>&nbsp;&nbsp;
-                            <label>
-                                <input type="radio" name="editList" value="radiobuttons" ng-model="element.ListType" /> Radiobuttons
-                            </label>
-                        </span>
-                    </div>
-                    <div class="control-group" style="vertical-align:top;" ng-if="element.Type == 'list'">
-                        <label class="control-label fieldvalues-label" style="vertical-align:top;">Værdier</label>
-                            <ul ui-sortable="sortableOptions" ng-model="element.Values" class="unstyled fieldvalues">
-
-                                <li ng-repeat="node in element.Values track by $index">
-                                    <input ng-model="node.Value" type="text" class="form-control">
-                                    <i class="icon icon-add" ng-click="addValue(element.Values, $index)" style="cursor:pointer;"></i>
-                                    <i class="icon icon-delete" ng-click="removeValue(element.Values, $index)"  style="cursor:pointer;"></i>
-                                    <i class="icon icon-navigation handle"></i>
-                                </li>
-
-                            </ul>
-                    </div>
+                <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
+                  <label class="control-label">Forklaring</label>
+                  <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Help" placeholder="Skriv evt. en forklaring til feltet..." />
                 </div>
+                <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
+                  <label class="control-label">Skal udfyldes</label>
+                  <input type="checkbox" class="" ng-model="element.Required" />
+                </div>
+                <div class="control-group" ng-if="element.Type == 'list'">
+                  <label class="control-label">Liste type</label>
+                  <span>
+                    <label>
+                      <input type="radio" name="editList" value="dropdown" ng-model="element.ListType" /> Dropdown
+                    </label>&nbsp;&nbsp;
+                    <label>
+                      <input type="radio" name="editList" value="checkbokse" ng-model="element.ListType" /> Checkbokse
+                    </label>&nbsp;&nbsp;
+                    <label>
+                      <input type="radio" name="editList" value="radiobuttons" ng-model="element.ListType" /> Radiobuttons
+                    </label>
+                  </span>
+                </div>
+                <div class="control-group" style="vertical-align:top;" ng-if="element.Type == 'list'">
+                  <label class="control-label fieldvalues-label" style="vertical-align:top;">Værdier</label>
+                  <ul ui-sortable="sortableOptions" ng-model="element.Values" class="unstyled fieldvalues">
+
+                    <li ng-repeat="node in element.Values track by $index">
+                      <input ng-model="node.Value" type="text" class="form-control">
+                      <i class="icon icon-add" ng-click="addValue(element.Values, $index)" style="cursor:pointer;"></i>
+                      <i class="icon icon-delete" ng-click="removeValue(element.Values, $index)" style="cursor:pointer;"></i>
+                      <i class="icon icon-navigation handle"></i>
+                    </li>
+
+                  </ul>
+                </div>
+              </div>
             </div>
+          </div>
+          <div ng-if="rowDeleteState">
+            <div ng-repeat="element in cell.Elements">
+              {{element.Label}}
+            </div>
+          </div>
         </div>
-        
-    <div>
-        <button type="button" class="btn btn-success" ng-click="overlay.show = true">Tilføj nyt formelement</button>
-        <button type="button" class="btn btn-info" ng-click="template.show = true">Vælg template</button>
+      </div>
     </div>
 
-    <umb-overlay 
-        ng-if="overlay.show"
-        model="overlay"
-        view="overlay.view"
-        position="right">
+    <h4>Oprettede felter der ikke vises i formularen<br /><small>Træk de ønskede felter til layoutet ovenfor</small></h4>
+
+    <div ng-model="model.value.Unassigned" class="formulate-cell ui-sortable" ui-sortable="fieldSortableOptions">
+      <div class="formulate-cell-field ui-sortable-handle" ng-repeat="element in model.value.Unassigned">
+        <i class="{{element.Icon}}" title="{{element.Name | limitTo:50}}" style="cursor:help;"></i> {{element.Label | limitTo:50 }}
+        <span class="formeditor-icons">
+          <i ng-class="element.Edit ? 'icon-navigation-up' : 'icon-navigation-down'" ng-click="element.Edit = !element.Edit"></i>
+          <i class="icon-arrow-up"></i>
+          <i class="icon-delete-key red" ng-click="deleteUnassignedElement(element)" title="Slet"></i>
+        </span>
+
+        <div class="formeditor-details" ng-if="element.Edit">
+          <hr />
+          <div class="control-group">
+            <label class="control-label">Navn</label>
+            <span ng-show="element.Type != 'headline' && element.Type != 'text'">
+              <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
+            </span>
+            <input ng-show="element.Type == 'headline'" type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
+            <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
+          </div>
+          <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
+            <label class="control-label">Forklaring</label>
+            <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Help" placeholder="Skriv evt. en forklaring til feltet..." />
+          </div>
+          <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
+            <label class="control-label">Skal udfyldes</label>
+            <input type="checkbox" class="" ng-model="element.Required" />
+          </div>
+          <div class="control-group" ng-if="element.Type == 'list'">
+            <label class="control-label">Liste type</label>
+            <span>
+              <label>
+                <input type="radio" name="editList" value="dropdown" ng-model="element.ListType" /> Dropdown
+              </label>&nbsp;&nbsp;
+              <label>
+                <input type="radio" name="editList" value="checkbokse" ng-model="element.ListType" /> Checkbokse
+              </label>&nbsp;&nbsp;
+              <label>
+                <input type="radio" name="editList" value="radiobuttons" ng-model="element.ListType" /> Radiobuttons
+              </label>
+            </span>
+          </div>
+          <div class="control-group" style="vertical-align:top;" ng-if="element.Type == 'list'">
+            <label class="control-label fieldvalues-label" style="vertical-align:top;">Værdier</label>
+            <ul ui-sortable="sortableOptions" ng-model="element.Values" class="unstyled fieldvalues">
+
+              <li ng-repeat="node in element.Values track by $index">
+                <input ng-model="node.Value" type="text" class="form-control">
+                <i class="icon icon-add" ng-click="addValue(element.Values, $index)" style="cursor:pointer;"></i>
+                <i class="icon icon-delete" ng-click="removeValue(element.Values, $index)" style="cursor:pointer;"></i>
+                <i class="icon icon-navigation handle"></i>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <button type="button" class="btn btn-success" ng-click="overlay.show = true">Tilføj nyt formelement</button>
+      <button type="button" class="btn btn-info" ng-click="template.show = true">Vælg template</button>
+    </div>
+
+    <umb-overlay ng-if="overlay.show"
+                 model="overlay"
+                 view="overlay.view"
+                 position="right">
     </umb-overlay>
 
     <umb-overlay ng-if="template.show"
@@ -164,5 +163,5 @@
                  view="template.view"
                  position="right">
     </umb-overlay>
-</div>
+  </div>
 </div>
