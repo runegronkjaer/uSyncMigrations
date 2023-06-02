@@ -38,7 +38,7 @@
                                             <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
                                         </span>
                                         <input ng-show="element.Type == 'headline'" type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
-                                        <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6" />
+                                        <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
                                     </div>
                                     <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
                                         <label class="control-label">Forklaring</label>
@@ -106,7 +106,7 @@
                             <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
                         </span>
                         <input ng-show="element.Type == 'headline'" type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
-                        <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6" />
+                        <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
                     </div>
                     <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
                         <label class="control-label">Forklaring</label>
@@ -164,4 +164,5 @@
                  view="template.view"
                  position="right">
     </umb-overlay>
+</div>
 </div>
