@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+	<PropertyGroup>
+<<<<<<< HEAD
+		<TargetFramework>net7.0</TargetFramework>
+=======
+		<TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+>>>>>>> main
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<StaticWebAssetBasePath>App_Plugins</StaticWebAssetBasePath>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<PackageId>uSync.Migrations</PackageId>
+		<Title>uSync Migrations</Title>
+		<Description>Migration tool for Umbraco Runs on 10+ migrates from 7</Description>
+		<AssemblyVersion>4.0.0.0</AssemblyVersion>
+		<FileVersion>4.0.0.0</FileVersion>
+	</PropertyGroup>	
+	
+	<ItemGroup>
+		<PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="11.3.1" />
+		<PackageReference Include="Umbraco.Cms.Web.Website" Version="11.3.1" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+		<PackageReference Include="uSync.BackOffice" Version="11.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>uSync.Migrations.Tests</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+</Project>

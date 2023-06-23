@@ -20,7 +20,7 @@ public class NestedContentMigrator : SyncPropertyMigratorBase
     public override string GetEditorAlias(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
         => UmbConstants.PropertyEditors.Aliases.NestedContent;
 
-    public override object GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
+    public override object? GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
     {
         if (dataTypeProperty?.PreValues == null) return new NestedContentConfiguration();
 
@@ -39,7 +39,7 @@ public class NestedContentMigrator : SyncPropertyMigratorBase
     }
 
     // TODO: [KJ] Nested content GetContentValue (so we can recurse)
-    public override string GetContentValue(SyncMigrationContentProperty contentProperty, SyncMigrationContext context)
+    public override string? GetContentValue(SyncMigrationContentProperty contentProperty, SyncMigrationContext context)
     {
         if (string.IsNullOrWhiteSpace(contentProperty.Value)) return string.Empty;
 
@@ -48,15 +48,30 @@ public class NestedContentMigrator : SyncPropertyMigratorBase
 
         foreach (var row in rowValues)
         {
+            if (row.Id == default)
+            {
+                row.Id = Guid.NewGuid();
+            }
+
             foreach (var property in row.RawPropertyValues)
             {
                 var editorAlias = context.ContentTypes.GetEditorAliasByTypeAndProperty(row.ContentTypeAlias, property.Key);
                 if (editorAlias == null) continue;
-                
-                var migrator = context.Migrators.TryGetMigrator(editorAlias.OriginalEditorAlias);
-                if (migrator != null)
+
+                try
                 {
-                    row.RawPropertyValues[property.Key] = migrator.GetContentValue(new SyncMigrationContentProperty(row.ContentTypeAlias, property.Value?.ToString()), context);
+                    var migrator = context.Migrators.TryGetMigrator(editorAlias.OriginalEditorAlias);
+                    if (migrator != null)
+                    {
+                        row.RawPropertyValues[property.Key] = migrator.GetContentValue(
+                            new SyncMigrationContentProperty(
+                                row.ContentTypeAlias, property.Key, row.ContentTypeAlias, property.Value?.ToString()),
+                                context);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception($"Nested Error: [{editorAlias.OriginalEditorAlias} -{property.Key}] : {ex.Message}", ex);
                 }
             }
         }

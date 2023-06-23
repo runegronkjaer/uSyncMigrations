@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Composing;
 using uSync.Migrations.Context;
 using uSync.Migrations.Migrators.Models;
+using uSync.Migrations.Models;
 
 namespace uSync.Migrations.Migrators;
 
@@ -15,9 +16,9 @@ public interface ISyncPropertyMigrator : IDiscoverable
 
     public string GetDatabaseType(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context);
 
-    public object GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context);
+    public object? GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context);
 
-    public string GetContentValue(SyncMigrationContentProperty contentProperty, SyncMigrationContext context);
+    public string? GetContentValue(SyncMigrationContentProperty contentProperty, SyncMigrationContext context);
 }
 
 
@@ -41,4 +42,39 @@ public interface ISyncReplacablePropertyMigrator : ISyncPropertyMigrator
 public interface ISyncVariationPropertyMigrator
 {
     public Attempt<CulturedPropertyValue> GetVariedElements(SyncMigrationContentProperty contentProperty, SyncMigrationContext context);
+}
+
+/// <summary>
+/// interface to implemenet if your property splits up a value into separate properties
+/// </summary>
+public interface ISyncPropertySplittingMigrator
+{
+    /// <summary>
+    /// gets a dictionary of alias/value pairs of new properties to map to
+    /// </summary>
+    IEnumerable<SplitPropertyContent> GetContentValues(SyncMigrationContentProperty migrationProperty, SyncMigrationContext context);
+
+
+    IEnumerable<SplitPropertyInfo> GetSplitProperties(string contentTypeAlias, string propertyAlias, string propertyName, SyncMigrationContext context);
+}
+
+/// <summary>
+///  interface to call when we are merging properties together. 
+/// </summary>
+public interface ISyncPropertyMergingMigrator
+{
+    /// <summary>
+    ///  list of content types this merger will work for. 
+    /// </summary>
+    string[] ContentTypes { get; }
+
+    /// <summary>
+    ///  Get what the merged property will be called - and create it.
+    /// </summary>
+    SplitPropertyInfo GetMergedProperty(string contentTypeAlias, string propertyAlias, string propertyName, SyncMigrationContext context);
+
+    /// <summary>
+    ///  get the merged values 
+    /// </summary>
+    string GetMergedContentValues(IEnumerable<MergingPropertyValue> mergingPropertyValues, SyncMigrationContext context);
 }

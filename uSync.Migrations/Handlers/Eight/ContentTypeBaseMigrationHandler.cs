@@ -5,7 +5,9 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using uSync.Migrations.Composing;
 using uSync.Migrations.Context;
+using uSync.Migrations.Extensions;
 using uSync.Migrations.Handlers.Shared;
 using uSync.Migrations.Services;
 
@@ -17,11 +19,12 @@ internal class ContentTypeBaseMigrationHandler<TEntity> : SharedContentTypeBaseH
         IEventAggregator eventAggregator,
         ISyncMigrationFileService migrationFileService,
         ILogger<ContentTypeBaseMigrationHandler<TEntity>> logger,
-        IDataTypeService dataTypeService) 
-        : base(eventAggregator, migrationFileService, logger, dataTypeService)
+        IDataTypeService dataTypeService,
+        Lazy<SyncMigrationHandlerCollection> migrationHandlers) 
+        : base(eventAggregator, migrationFileService, logger, dataTypeService, migrationHandlers)
     { }
 
-    protected override void UpdatePropertyXml(XElement newProperty, SyncMigrationContext context, string contentTypeGuid )
+    protected override void UpdatePropertyXml(XElement source, XElement newProperty, SyncMigrationContext context)
     {
         // for v8 the properties should match what we are expecting ?
     }
@@ -32,7 +35,7 @@ internal class ContentTypeBaseMigrationHandler<TEntity> : SharedContentTypeBaseH
     protected override void UpdateInfoSection(XElement? info, XElement target, Guid key, SyncMigrationContext context)
     {
         if (info == null) return;
-        target.Add(XElement.Parse(info.ToString()));
+        target.Add(info.Clone());
     }
 
 
@@ -40,22 +43,19 @@ internal class ContentTypeBaseMigrationHandler<TEntity> : SharedContentTypeBaseH
     {
         var sourceStructure = source.Element("Structure");
         if (sourceStructure != null)
-            target.Add(XElement.Parse(sourceStructure.ToString()));
+            target.Add(sourceStructure.Clone());
     }
 
     protected override void UpdateTabs(XElement source, XElement target, SyncMigrationContext context)
     {
         var sourceTabs = source.Element("Tabs");
         if (sourceTabs != null)
-            target.Add(XElement.Parse(sourceTabs.ToString()));
+            target.Add(sourceTabs.Clone());
     }
 
-    protected override void CheckVariations(XElement target, SyncMigrationContext context )
+    protected override void CheckVariations(XElement target)
     {
         // for v8 we are assuming variations are sound (for now!)
     }
 
-  protected override bool HasVariations( XElement target ) {
-    return false;
-  }
 }

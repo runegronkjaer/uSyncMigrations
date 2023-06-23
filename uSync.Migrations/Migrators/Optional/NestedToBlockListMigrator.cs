@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Umbraco.Cms.Core;
@@ -17,8 +19,12 @@ namespace uSync.Migrations.Migrators.Optional;
 [SyncMigratorVersion(7,8)]
 public class NestedToBlockListMigrator : SyncPropertyMigratorBase
 {
-    public NestedToBlockListMigrator()
-    { }
+    private readonly ILogger<NestedToBlockListMigrator> _logger;
+
+    public NestedToBlockListMigrator(ILogger<NestedToBlockListMigrator> logger)
+    {
+        _logger = logger;
+    }
 
     public override string GetEditorAlias(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
         => UmbConstants.PropertyEditors.Aliases.BlockList;
@@ -26,7 +32,7 @@ public class NestedToBlockListMigrator : SyncPropertyMigratorBase
     /// <summary>
     ///  convert a nested datatype config to a block list one.
     /// </summary>
-    public override object GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
+    public override object? GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
     {
         switch (context.Metadata.SourceVersion)
         {
@@ -99,7 +105,7 @@ public class NestedToBlockListMigrator : SyncPropertyMigratorBase
     }
 
 
-    public override string GetContentValue(SyncMigrationContentProperty contentProperty, SyncMigrationContext context)
+    public override string? GetContentValue(SyncMigrationContentProperty contentProperty, SyncMigrationContext context)
     {
         if (string.IsNullOrWhiteSpace(contentProperty.Value)) return string.Empty;
         var rowValues = JsonConvert.DeserializeObject<IList<NestedContentRowValue>>(contentProperty.Value);
@@ -127,16 +133,27 @@ public class NestedToBlockListMigrator : SyncPropertyMigratorBase
 
             foreach (var property in row.RawPropertyValues)
             {
+                _logger.LogDebug("NestedToBlockList: {ContentType} {key}", row.ContentTypeAlias, property.Key);
+
                 var editorAlias = context.ContentTypes.GetEditorAliasByTypeAndProperty(row.ContentTypeAlias, property.Key);
                 if (editorAlias == null) continue;
+
+                _logger.LogDebug("NestedToBlockList: Property: {editorAlias}", editorAlias);
 
                 var migrator = context.Migrators.TryGetMigrator(editorAlias.OriginalEditorAlias);
                 if (migrator != null)
                 {
-                    block.RawPropertyValues[property.Key] = migrator.GetContentValue(new SyncMigrationContentProperty(row.ContentTypeAlias, property.Value.ToString()), context);
+                    _logger.LogDebug("NestedToBlockList: Found Migrator: {migrator}", migrator.GetType().Name);
+
+                    block.RawPropertyValues[property.Key] = migrator.GetContentValue(
+                        new SyncMigrationContentProperty(
+                            row.ContentTypeAlias,
+                            property.Key,
+                            row.ContentTypeAlias, property.Value?.ToString() ?? string.Empty), context);
                 }
                 else
                 {
+                    _logger.LogDebug("NestedToBlockList: No Migrator found");
                     block.RawPropertyValues[property.Key] = property.Value;
                 }
             }

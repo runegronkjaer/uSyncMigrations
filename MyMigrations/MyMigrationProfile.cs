@@ -15,7 +15,7 @@ namespace MyMigrations;
 ///  A Custom migration profile, to do things in special ways.
 /// </summary>
 
-public class MyMigrationProfile : ISyncMigrationProfile
+public class MyMigrationProfile : ISyncMigrationPlan
 {
     private readonly SyncMigrationHandlerCollection _migrationHandlers;
 
@@ -52,6 +52,16 @@ public class MyMigrationProfile : ISyncMigrationProfile
         },
 
         // eveything beneath is optional... 
+
+        //PropertyMigrators = new Dictionary<string, string>()
+        //{
+        //    // use the NestedToBlockListMigrator For myProperty in the 'MyContentType' contentType
+        //    { "myContentType_myProperty", nameof(NestedToBlockListMigrator) }, 
+
+        //    // Convert all properties called myGridProperty to blocklist 
+        //    { "myGridProperty", nameof(GridToBlockListMigrator) }
+        //},
+
 
         // add a list of things we don't want to import 
         BlockedItems = new Dictionary<string, List<string>>

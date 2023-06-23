@@ -14,11 +14,11 @@ public class CheckboxListMigrator : SyncPropertyMigratorBase
     public override string GetDatabaseType(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
         => nameof(ValueStorageType.Nvarchar);
 
-    public override object GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
+    public override object? GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
     {
         var config = new ValueListConfiguration();
 
-        foreach (var item in dataTypeProperty.PreValues)
+        foreach (var item in dataTypeProperty.PreValues ?? Enumerable.Empty<Migrations.Models.PreValue>())
         {
             config.Items.Add(new ValueListConfiguration.ValueListItem
             {
@@ -30,7 +30,7 @@ public class CheckboxListMigrator : SyncPropertyMigratorBase
         return config;
     }
 
-    public override string GetContentValue(SyncMigrationContentProperty contentProperty, SyncMigrationContext context)
+    public override string? GetContentValue(SyncMigrationContentProperty contentProperty, SyncMigrationContext context)
         => string.IsNullOrWhiteSpace(contentProperty.Value) 
             ? contentProperty.Value
             : JsonConvert.SerializeObject(contentProperty.Value.ToDelimitedList(), Formatting.Indented);

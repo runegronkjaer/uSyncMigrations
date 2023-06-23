@@ -3,17 +3,15 @@ using Newtonsoft.Json;
 using uSync.Migrations.Context;
 using uSync.Migrations.Extensions;
 using uSync.Migrations.Migrators.Models;
-using uSync.Migrations.Models;
 using uSync.Migrations.Migrators.Models.NuPickers;
+using Umbraco.Extensions;
 
 namespace uSync.Migrations.Migrators.Community
 {
     [SyncMigrator("nuPickers.EnumCheckBoxPicker")]
-    public class NuPickersEnumCheckBoxPickerToContentmentDataList : SyncPropertyMigratorBase
+    public class NuPickersEnumCheckBoxPickerToContentmentDataList : NuPickersToContentmentDataListBase
     {
-        public override string GetEditorAlias(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
-      => "Umbraco.Community.Contentment.DataList";
-        public override object GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
+        public override object? GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
         {
             var nuPickersConfig = JsonConvert.DeserializeObject<NuPickersEnumConfig>(dataTypeProperty.PreValues?.GetPreValueOrDefault("dataSource", string.Empty));
 
@@ -26,7 +24,7 @@ namespace uSync.Migrations.Migrators.Community
                 { key = "Umbraco.Community.Contentment.DataEditors.EnumDataListSource, Umbraco.Community.Contentment",
                     value = new
                     {
-                        EnumType = new [] { nuPickersConfig?.AssemblyName }
+                        enumType = new [] { nuPickersConfig?.AssemblyName.TrimEnd(".dll"), nuPickersConfig?.EnumName }
                     }
                 }
             }.ToList();

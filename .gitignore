@@ -263,4 +263,5 @@ $RECYCLE.BIN/
 /usync/test
 .idea
 uSyncMigrationSite/web.config
+/uSyncMigrationSite/config
 eForsyning/uSync/Migrations

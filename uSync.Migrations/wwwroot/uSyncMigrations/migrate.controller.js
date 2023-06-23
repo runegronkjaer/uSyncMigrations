@@ -123,9 +123,7 @@
                 handlers: vm.options.handlers,
                 view: Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath + '/uSyncMigrations/dialogs/handlerPicker.html',
                 submit: function (handlers) {
-                    console.log(handlers);
                     vm.options.handlers = handlers;
-                    console.log(vm.options.handlers);
                     editorService.close();
                 },
                 close: function () {
@@ -156,7 +154,6 @@
         vm.importItems = importItems;
 
         function importItems(folder) {
-            console.log(folder);
 
             if (vm.working === true) return;
             vm.progress = 'importing';
@@ -360,6 +357,7 @@
             'Sequesting carbon footprints',
             'Chlorinating Car Pools',
             'Partitioning Social Network',
+            'Estimating more than 3 weeks for migration',
             'Prelaminating Drywall Inventory',
             'Blurring Reality Lines',
             'Reticulating 3 - Dimensional Splines',

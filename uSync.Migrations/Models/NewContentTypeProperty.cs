@@ -5,4 +5,5 @@ public class NewContentTypeProperty {
   public string Alias { get; set; }
   public string DataTypeAlias { get; set; }
   public Guid DataTypeGuid { get; set; }
+    public string OriginalEditorAlias { get; set; }
 }

@@ -1,6 +1,9 @@
-﻿using NUglify.Helpers;
+using System.Diagnostics;
 
-using Umbraco.Cms.Core;
+using Microsoft.Extensions.Logging;
+
+using NUglify.Helpers;
+
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
 
@@ -9,7 +12,8 @@ using uSync.Migrations.Composing;
 using uSync.Migrations.Configuration.Models;
 using uSync.Migrations.Context;
 using uSync.Migrations.Handlers;
-using uSync.Migrations.Migrators;
+using uSync.Migrations.Helpers;
+using uSync.Migrations.Migrators.Community.Archetype;
 using uSync.Migrations.Models;
 
 namespace uSync.Migrations.Services;
@@ -17,23 +21,34 @@ namespace uSync.Migrations.Services;
 internal class SyncMigrationService : ISyncMigrationService
 {
     private readonly ISyncMigrationFileService _migrationFileService;
+    private readonly ILogger<SyncMigrationService> _logger;
+
     private readonly SyncMigrationHandlerCollection _migrationHandlers;
     private readonly SyncMigrationValidatorCollection _migrationValidators;
     private readonly uSyncConfigService _usyncConfig;
     private readonly SyncPropertyMigratorCollection _migrators;
+    private readonly ArchetypeMigrationConfigurerCollection _archetypeConfigurers;
+    private readonly SyncPropertyMergingCollection _mergingCollection;
 
     public SyncMigrationService(
+        ILogger<SyncMigrationService> logger,
         ISyncMigrationFileService migrationFileService,
         SyncMigrationHandlerCollection migrationHandlers,
         uSyncConfigService usyncConfig,
         SyncMigrationValidatorCollection migrationValidators,
-        SyncPropertyMigratorCollection migrators)
+        SyncPropertyMigratorCollection migrators,
+        ArchetypeMigrationConfigurerCollection archetypeConfigures,
+        SyncPropertyMergingCollection mergingCollection)
     {
+        _logger = logger;
+
         _migrationFileService = migrationFileService;
         _migrationHandlers = migrationHandlers;
         _usyncConfig = usyncConfig;
         _migrationValidators = migrationValidators;
         _migrators = migrators;
+        _archetypeConfigurers = archetypeConfigures;
+        _mergingCollection = mergingCollection;
     }
 
     public IEnumerable<string> HandlerTypes(int version)
@@ -45,17 +60,32 @@ internal class SyncMigrationService : ISyncMigrationService
     public IEnumerable<ISyncMigrationHandler> GetHandlers(int version)
         => _migrationHandlers.Where(x => x.SourceVersion == version);
 
-    public Attempt<string> ValidateMigrationSource(int version, string source)   
-        => _migrationFileService.ValdateMigrationSource(version, source);
 
-    /// <summary>
+    public int DetectVersion(string folder)
+    {
+        var uSyncFolder = _migrationFileService.GetMigrationFolder(folder, false);
+        return MigrationIoHelpers.DetectVersion(uSyncFolder);   
+    }
+
+     /// <summary>
     ///  validate things before we run through them and do an actuall migration.
     /// </summary>
     /// <param name="options"></param>
     /// <returns></returns>
-    public MigrationResults Validate(MigrationOptions options)
+    public MigrationResults Validate(MigrationOptions? options)
     {
-        options.Source = _migrationFileService.GetMigrationFolder(options.Source);
+        if (options == null)
+        {
+            return new MigrationResults
+            {
+                MigrationId = Guid.Empty,
+                Success = false,
+                Messages = new MigrationMessage("Fail", "No Options", MigrationMessageType.Error).AsEnumerableOfOne()
+            };
+        }
+
+        options.Source = _migrationFileService.GetMigrationFolder(options.Source, false);
+        options.SourceVersion = MigrationIoHelpers.DetectVersion(options.Source);
 
         var messages = new List<MigrationMessage>();
 
@@ -79,11 +109,18 @@ internal class SyncMigrationService : ISyncMigrationService
         };
     }
 
+
     public MigrationResults MigrateFiles(MigrationOptions options)
     {
+        var sw = Stopwatch.StartNew();
+
         var migrationId = Guid.NewGuid();
-        var sourceRoot = _migrationFileService.GetMigrationFolder(options.Source);
-        var targetRoot = _migrationFileService.GetMigrationFolder(options.Target);
+        var sourceRoot = _migrationFileService.GetMigrationFolder(options.Source, false);
+        var targetRoot = _migrationFileService.GetMigrationFolder(options.Target, true);
+
+
+        // make sure its here.
+        _logger.LogInformation("Migrating from {source} to {target}", sourceRoot, targetRoot);
 
         // TODO: Add notifications for `uSyncMigrationStartingNotification` and `uSyncMigrationCompleteNotification`? [LK]
         // Pass through the context, in case 3rd-party wants to populate/reference it? [LK]
@@ -98,12 +135,18 @@ internal class SyncMigrationService : ISyncMigrationService
 
             var success = results.All(x => x.MessageType != MigrationMessageType.Error);
 
-            if (success == true && results.Count() > 0)
+            if (success == true && results.Any())
             {
+                // here...
+                _logger.LogInformation("Copying from working to folder {targetRoot}", targetRoot);
+
                 // if everything works
                 _migrationFileService.CopyMigrationToFolder(migrationId, targetRoot);
                 _migrationFileService.RemoveMigration(migrationId);
             }
+
+            sw.Stop();
+            _logger.LogInformation("Migration Complete {success} {count} ({elapsed}ms)", success, results.Count(), sw.ElapsedMilliseconds);
 
             return new MigrationResults
             {
@@ -129,13 +172,14 @@ internal class SyncMigrationService : ISyncMigrationService
             .OrderBy(x => x.Priority);
     }
 
-    private static IEnumerable<MigrationMessage> MigrateFromDisk(Guid migrationId, string sourceRoot, SyncMigrationContext migrationContext, IOrderedEnumerable<ISyncMigrationHandler> handlers)
+    private IEnumerable<MigrationMessage> MigrateFromDisk(Guid migrationId, string sourceRoot, SyncMigrationContext migrationContext, IOrderedEnumerable<ISyncMigrationHandler> handlers)
     {
         // maybe replace with a Dictionary<string, MigrationMessage> (with `ItemType` as the key)?
         var results = new List<MigrationMessage>();
 
         foreach (var handler in handlers)
         {
+            _logger.LogInformation("Migrating {handler} files", handler.GetType().Name);
             results.AddRange(handler.DoMigration(migrationContext));
         }
 
@@ -144,6 +188,8 @@ internal class SyncMigrationService : ISyncMigrationService
 
     private SyncMigrationContext PrepareContext(Guid migrationId, string sourceRoot, MigrationOptions options)
     {
+        _logger.LogInformation("PrepareContext {id} {source}", migrationId, sourceRoot);
+
         var context = new SyncMigrationContext(migrationId, sourceRoot, options.SourceVersion);
 
         if (options.BlockListViews)
@@ -174,9 +220,11 @@ internal class SyncMigrationService : ISyncMigrationService
 
         // tabs that we might want to rename, delete or move properties from/to
         options.ChangeTabs?
-            .ForEach(x => context.AddChangedTabs(x));
+            .ForEach(x => context.ContentTypes.AddChangedTabs(x));
 
         AddMigrators(context, options.PreferredMigrators);
+
+        AddMergers(context, options.MergingProperties);
 
         // let the handlers run through their prep (populate all the lookups)
         GetHandlers(options.SourceVersion)?
@@ -184,11 +232,17 @@ internal class SyncMigrationService : ISyncMigrationService
             .ToList()
             .ForEach(x => x.PrepareMigrations(context));
 
+        // add configurer for Archetype migrations
+        context.ContentTypes.ArchetypeMigrationConfigurer = _archetypeConfigurers.FirstOrDefault(c => c.GetType().Name == options.ArchetypeMigrationConfigurer) 
+            ?? new DefaultArchetypeMigrationConfigurer();
+
         return context;
     }
 
     private void AddMigrators(SyncMigrationContext context, IDictionary<string,string>? preferredMigrators)
     {
+        _logger.LogInformation("Adding migrators");
+
         var preferredList = _migrators.GetPreferredMigratorList(preferredMigrators);
         if (preferredList != null)
         {
@@ -196,6 +250,25 @@ internal class SyncMigrationService : ISyncMigrationService
             {
                 context.Migrators.AddPropertyMigration(item.EditorAlias, item.Migrator);
             }
+        }
+    }
+
+    private void AddMergers(SyncMigrationContext context, Dictionary<string, MergingPropertiesConfig> mergingProperties)
+    {
+        _logger.LogInformation("Adding property mergers");
+
+        foreach (var mergingProperty in mergingProperties)
+        {
+            // find the merger. 
+            var merger = _mergingCollection.GetByName(mergingProperty.Value.Merger);
+            if (merger == null) continue;
+
+            // add the merger to the context. 
+            _logger.LogInformation("Loading Merger {merger} for {contentType}", merger.GetType().Name, mergingProperty.Key);
+            context.Migrators.AddMergingMigrator(mergingProperty.Key, merger);
+
+            // the merging properties. 
+            context.Content.AddMergedProperty(mergingProperty.Key, mergingProperty.Value);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
+using uSync.Migrations.Models;
+
 namespace uSync.Migrations.Configuration.Models;
 
 [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
@@ -17,6 +19,16 @@ public class MigrationOptions
     public IList<HandlerOption>? Handlers { get; set; }
 
     public IDictionary<string, string>? PreferredMigrators { get; set; }
+
+    /// <summary>
+    ///  migrators by property name. 
+    /// </summary>
+    /// <remarks>
+    ///  property migrators will be searched by property alias
+    ///  and contentType_propertyAlias, so you can define both 
+    ///  for all properties with a name, or restrict to the content/media type
+    /// </remarks>
+    public IDictionary<string, string>? PropertyMigrators { get; set; }
 
     public bool BlockListViews { get; set; } = true;
 
@@ -38,6 +50,14 @@ public class MigrationOptions
     /// List of tabs that will be changed
     /// </summary>
     public List<TabOptions>? ChangeTabs { get; set; }
+
+    public string? ArchetypeMigrationConfigurer { get; set; }
+
+    /// <summary>
+    ///  things we might want to merge. 
+    /// </summary>
+    public Dictionary<string, MergingPropertiesConfig> MergingProperties { get; set; } = new(StringComparer.InvariantCultureIgnoreCase);
+
 }
 
 [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]

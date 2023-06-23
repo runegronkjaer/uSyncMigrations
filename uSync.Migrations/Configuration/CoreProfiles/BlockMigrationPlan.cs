@@ -1,26 +1,22 @@
-﻿using System.Text.RegularExpressions;
-
-using Umbraco.Cms.Core.Composing;
-
-using uSync.Migrations.Composing;
+﻿using uSync.Migrations.Composing;
 using uSync.Migrations.Configuration.Models;
 using uSync.Migrations.Migrators.BlockGrid;
 using uSync.Migrations.Migrators.Optional;
 
 namespace uSync.Migrations.Configuration.CoreProfiles;
 
-internal class BlockMigrationProfile : ISyncMigrationProfile
+public class BlockMigrationPlan : ISyncMigrationPlan
 {
     private readonly SyncMigrationHandlerCollection _migrationHandlers;
 
-    public BlockMigrationProfile(SyncMigrationHandlerCollection migrationHandlers)
+    public BlockMigrationPlan(SyncMigrationHandlerCollection migrationHandlers)
     {
         _migrationHandlers = migrationHandlers;
     }
 
     public int Order => 200;
 
-	public string Name => "Convert to BlockLists and BlockGrid";
+    public string Name => "Convert to Nested Content to BlockLists and Grid to BlockGrid";
 
     public string Icon => "icon-brick color-green";
 
@@ -30,13 +26,13 @@ internal class BlockMigrationProfile : ISyncMigrationProfile
     {
         Group = "Convert",
         Source = "uSync/v9",
-		Target = $"{uSyncMigrations.MigrationFolder}/{DateTime.Now:yyyyMMdd_HHmmss}",
-		Handlers = _migrationHandlers.SelectGroup(8, string.Empty),
+        Target = $"{uSyncMigrations.MigrationFolder}/{DateTime.Now:yyyyMMdd_HHmmss}",
+        Handlers = _migrationHandlers.SelectGroup(8, string.Empty),
         SourceVersion = 8,
         PreferredMigrators = new Dictionary<string, string>
         {
-			{ UmbConstants.PropertyEditors.Aliases.NestedContent, nameof(NestedToBlockListMigrator) },
-			{ UmbConstants.PropertyEditors.Aliases.Grid, nameof(Gridv7ToBlockGridMigrator) }
+            { UmbConstants.PropertyEditors.Aliases.NestedContent, nameof(NestedToBlockListMigrator) },
+            { UmbConstants.PropertyEditors.Aliases.Grid, nameof(GridToBlockGridMigrator) }
         }
     };
 }

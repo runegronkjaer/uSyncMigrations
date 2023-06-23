@@ -51,15 +51,15 @@ public class ColourPickerMigratorTests : MigratiorTestBase
     }
 
     protected override SyncMigrationDataTypeProperty GetMigrationDataTypeProperty()
-        => new SyncMigrationDataTypeProperty("Umbraco.ColorPickerAlias", "Nvarchar", _preValues);
+        => new SyncMigrationDataTypeProperty("Colour Picker", "Umbraco.ColorPickerAlias", "Nvarchar", _preValues);
 
     protected override SyncMigrationContentProperty GetMigrationContentProperty(string value)
-        => new SyncMigrationContentProperty("Umbraco.ColorPickerAlias", value);
+        => new SyncMigrationContentProperty("Test", "Colour picker", "Umbraco.ColorPickerAlias", value);
 
     [Test]
     public override void ConfigValueAsExpected()
     {
-        var value = _migrator.GetConfigValues(GetMigrationDataTypeProperty(), _context);
+        var value = _migrator!.GetConfigValues(GetMigrationDataTypeProperty(), _context!);
 
         Assert.AreEqual(_migratedValue, base.ConvertResultToJsonTestResult(value));
     }
