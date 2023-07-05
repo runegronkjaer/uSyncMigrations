@@ -217,7 +217,7 @@ internal class GridToBlockContentHelper {
 
             if ( Guid.TryParse( newDataTypeGuidString, out Guid newDataTypeGuid ) && !string.IsNullOrEmpty( propertyAlias ) ) {
               Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
-              string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
+              string? oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid )?.EditorAlias;
               editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
             }
             AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
@@ -230,7 +230,7 @@ internal class GridToBlockContentHelper {
           if ( allElementTypes.TryGetValue( contentTypeAlias, out Dictionary<string, Guid>? contentTypeProperties ) && contentTypeProperties?.Any() == true ) {
             if ( contentTypeProperties.TryGetValue( propertyAlias, out Guid newDataTypeGuid ) ) {
               Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
-              string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
+              string? oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid )?.EditorAlias;
               editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
 
             }
@@ -244,7 +244,7 @@ internal class GridToBlockContentHelper {
           if ( allElementTypes.TryGetValue( contentTypeAlias, out Dictionary<string, Guid>? contentTypeProperties ) && contentTypeProperties?.Any() == true ) {
             if ( contentTypeProperties.TryGetValue( propertyAlias, out Guid newDataTypeGuid ) ) {
               Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
-              string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
+              string? oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid )?.EditorAlias;
               editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
             }
           }

@@ -1,9 +1,5 @@
 ﻿using System.Xml.Linq;
-
-using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.Extensions.Logging;
-
-using Polly;
 
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -11,7 +7,6 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 using uSync.Core;
-using uSync.Migrations.Composing;
 using uSync.Migrations.Context;
 using uSync.Migrations.Extensions;
 using uSync.Migrations.Migrators;

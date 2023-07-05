@@ -8,19 +8,17 @@ using uSync.Migrations.Migrators.Models.NuPickers;
 
 namespace uSync.Migrations.Migrators.Community;
 
-[SyncMigrator("nuPickers.EnumDropDownPicker")]
-public class NuPickersEnumDropDownPickerToContentmentDataList : NuPickersToContentmentDataListBase
-{
-    public override object? GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
+[SyncMigrator( "nuPickers.EnumDropDownPicker" )]
+public class NuPickersEnumDropDownPickerToContentmentDataList : NuPickersToContentmentDataListBase {
+  public override object? GetConfigValues( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context ) {
+    var nuPickersConfig = JsonConvert.DeserializeObject<NuPickersEnumConfig>( dataTypeProperty.PreValues.GetPreValueOrDefault( "dataSource", string.Empty ) );
+
+    if ( nuPickersConfig == null )
+      return null;
+
+    //Using an anonymous object for now, but this should be replaced with Contentment objects (when they're created).
+    var dataSource = new[]
     {
-        var nuPickersConfig = JsonConvert.DeserializeObject<NuPickersEnumConfig>(dataTypeProperty.PreValues.GetPreValueOrDefault("dataSource", string.Empty));
-
-        if (nuPickersConfig == null)
-            return null;
-
-        //Using an anonymous object for now, but this should be replaced with Contentment objects (when they're created).
-        var dataSource = new[]
-        {
             new
             { key = "Umbraco.Community.Contentment.DataEditors.EnumDataListSource, Umbraco.Community.Contentment",
                 value = new
@@ -30,8 +28,8 @@ public class NuPickersEnumDropDownPickerToContentmentDataList : NuPickersToConte
             }
         }.ToList();
 
-        var listEditor = new[]
-        {
+    var listEditor = new[]
+    {
             new
             { key = "Umbraco.Community.Contentment.DataEditors.DropdownListDataListEditor, Umbraco.Community.Contentment",
                 value = new
@@ -41,12 +39,12 @@ public class NuPickersEnumDropDownPickerToContentmentDataList : NuPickersToConte
             }
         }.ToList();
 
-        var config = new JObject();
+    var config = new JObject();
 
-        config?.Add("dataSource", JToken.Parse(JsonConvert.SerializeObject(dataSource)));
-        config?.Add("listEditor", JToken.Parse(JsonConvert.SerializeObject(listEditor)));
+    config?.Add( "dataSource", JToken.Parse( JsonConvert.SerializeObject( dataSource ) ) );
+    config?.Add( "listEditor", JToken.Parse( JsonConvert.SerializeObject( listEditor ) ) );
 
-        return config;
+    return config;
 
-    }
+  }
 }
