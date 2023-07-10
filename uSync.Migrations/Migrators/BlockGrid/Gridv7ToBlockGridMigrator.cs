@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Services;
 namespace uSync.Migrations.Migrators.BlockGrid;
 
 [SyncMigrator( UmbConstants.PropertyEditors.Aliases.Grid )]
+[SyncMigrator( "our.umbraco.templatablegrid" )]
 [SyncMigratorVersion( 7 )]
 public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
   private readonly IGridConfig _gridConfig;
