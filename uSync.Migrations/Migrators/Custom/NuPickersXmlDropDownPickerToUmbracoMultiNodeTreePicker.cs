@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors;
 using uSync.Migrations.Context;
@@ -8,8 +7,8 @@ using uSync.Migrations.Extensions;
 using uSync.Migrations.Migrators.Models;
 
 namespace uSync.Migrations.Migrators.Custom {
-  [SyncMigrator( "nuPickers.DotNetDropDownPicker" )]
-  public class NuPickersDotNetDropDownPickerToUmbracoMultiNodeTreePicker : SyncPropertyMigratorBase {
+  [SyncMigrator( "nuPickers.XmlDropDownPicker" )]
+  public class NuPickersXmlDropDownPickerToUmbracoMultiNodeTreePicker : SyncPropertyMigratorBase {
     public override string GetEditorAlias( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context ) => "Umbraco.MultiNodeTreePicker";
 
     public override string GetDatabaseType( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context ) {
@@ -20,19 +19,19 @@ namespace uSync.Migrations.Migrators.Custom {
       var config = new JObject();
 
       JObject? obj = (JObject?)JsonConvert.DeserializeObject( dataTypeProperty.PreValues?.GetPreValueOrDefault( "dataSource", string.Empty ) );
-      string? className = (string?)obj?.Properties()?.FirstOrDefault( p => p.Name == "className" )?.Value;
+      string? xPath = (string?)obj?.Properties()?.FirstOrDefault( p => p.Name == "xPath" )?.Value;
 
-      if ( className == null ) {
+      if ( xPath == null ) {
         return config;
       }
 
-      if ( className?.Equals( "DffEdb.Umb.Api.DataSources.EforsyningerDotNetDataSource" ) == true ) {
-       return new MultiNodePickerConfiguration() {
+      if ( xPath?.Equals( "//eForsyningTheme" ) == true ) {
+        return new MultiNodePickerConfiguration() {
           TreeSource = new MultiNodePickerConfigurationTreeSource() {
             ObjectType = "content",
-            StartNodeQuery = "$current/ancestor::vaerk"
+            StartNodeQuery = "$root/globalSettings/eForsyningThemes"
           },
-          Filter = "eforsyning",
+          Filter = "eForsyningTheme",
           MinNumber = 0,
           MaxNumber = 1,
           ShowOpen = false,
@@ -44,7 +43,7 @@ namespace uSync.Migrations.Migrators.Custom {
     }
 
     public override string GetContentValue( SyncMigrationContentProperty contentProperty, SyncMigrationContext context ) {
-      if ( (contentProperty.ContentTypeAlias == "tilslutningsanmodningWidget" || contentProperty.ContentTypeAlias == "forsyningPaaAdresse" ) && contentProperty.PropertyAlias == "eforsyningNodeId" ) {
+      if ( contentProperty.ContentTypeAlias == "eforsyning" && contentProperty.PropertyAlias == "tema" ) {
         if ( !string.IsNullOrEmpty( contentProperty.Value ) && int.TryParse( contentProperty.Value, out int value ) ) {
           Guid guid = context.GetKey( value );
           if ( guid != Guid.Empty ) {
