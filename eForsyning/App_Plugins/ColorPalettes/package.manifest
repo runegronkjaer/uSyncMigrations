@@ -1,0 +1,44 @@
+﻿{
+    propertyEditors: [
+    {
+        alias: "Our.Umbraco.ColorPalettes",
+        name: "Color Palettes",
+        group: "Pickers",
+        icon: "icon-palette",
+        editor:{
+            view: "~/App_Plugins/ColorPalettes/views/ColorPalettes.html",
+            valueType: "JSON"
+        },
+        prevalues: {
+            fields:[
+				{
+                   label: "Hide radio buttons",
+                   description: "Hide the radio buttons in the palettes",
+                   key: "hideRadioButtons",
+                   view: "boolean"
+                },
+				{
+					label: "Palettes",
+					description: "Edit palettes",
+					key: "palettes",
+					view: "~/App_Plugins/ColorPalettes/views/ColorPalettes.Settings.html"
+				}
+            ]
+        }
+  	}],
+  	javascript: [
+		"~/App_Plugins/ColorPalettes/filters/CamelCase.js",
+		"~/App_Plugins/ColorPalettes/modules/ng-file-upload.js",
+		"~/App_Plugins/ColorPalettes/lib/Blob.js",
+		"~/App_Plugins/ColorPalettes/lib/FileSaver.js",
+		"~/App_Plugins/ColorPalettes/modules/angular-file-saver.js",
+		"~/App_Plugins/ColorPalettes/resources/ColorPalettes.Resource.js",
+		"~/App_Plugins/ColorPalettes/directives/PaletteDownload.js",
+    	"~/App_Plugins/ColorPalettes/controllers/ColorPalettesSettings.Controller.js",
+		"~/App_Plugins/ColorPalettes/controllers/PaletteEditorDialog.Controller.js",
+		"~/App_Plugins/ColorPalettes/controllers/ColorPalettes.Controller.js"
+	],
+    css: [
+        "~/App_Plugins/ColorPalettes/css/styles.css"
+    ]
+}
