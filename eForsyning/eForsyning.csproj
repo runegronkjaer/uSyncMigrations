@@ -13,14 +13,14 @@
 
   <ItemGroup>
     <PackageReference Include="Our.Umbraco.Community.Contentment.Core" Version="4.4.4" />
-    <PackageReference Include="Umbraco.Cms" Version="11.3.1" />
+    <PackageReference Include="Umbraco.Cms" Version="11.4.1" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-    <PackageReference Include="uSync" Version="11.1.0" />
-    <PackageReference Include="uSync.Core" Version="11.1.0" />
+    <PackageReference Include="uSync" Version="11.2.1" />
+    <PackageReference Include="uSync.Core" Version="11.2.1" />
     <ProjectReference Include="..\uSync.Migrations\uSync.Migrations.csproj" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
