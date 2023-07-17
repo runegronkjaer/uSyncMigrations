@@ -2,7 +2,7 @@
 
 app.requires.push('ngFileUpload');
 
-app.controller("Our.Umbraco.ColorPalettes.Settings.Controller", function ($scope, $timeout, notificationsService, dialogService, angularHelper, localizationService, Upload) {
+app.controller("Our.Umbraco.ColorPalettes.Settings.Controller", function ($scope, $timeout, notificationsService, editorService, angularHelper, localizationService, Upload) {
     var editDialog = null;
     var alreadyDirty = false;
 
@@ -83,65 +83,77 @@ app.controller("Our.Umbraco.ColorPalettes.Settings.Controller", function ($scope
         return true;
     };
 
+    $scope.openDropdownMenu = function () {
+      event.target.closest('.btn-group').classList.toggle('open');
+    }
+
     $scope.addPalette = function () {
 
         if (editDialog) {
             editDialog.close();
         }
         
-        editDialog = dialogService.open({
-            template: '/App_Plugins/ColorPalettes/views/PaletteEditDialog.html',
+        editDialog = editorService.open({
+            view: '/App_Plugins/ColorPalettes/views/PaletteEditDialog.html',
             show: true,
-            dialogData: null,
-            callback: done
-        });
+            size: 'small',
+            editorData: null,
+            submit: function(data) {
+              if (data.name && data.alias && data.colors) {
+                  // check if alias already exists
+                  var addToObject = true;
+                  for (var i = 0; i < $scope.palettes.length; i++) {
+                      if ($scope.palettes[i].alias === data.alias) {
+                          addToObject = false;
+                      }
+                  }
 
-        function done(data) {
-            if (data.name && data.alias && data.colors) {
-                // check if alias already exists
-                var addToObject = true;
-                for (var i = 0; i < $scope.palettes.length; i++) {
-                    if ($scope.palettes[i].alias === data.alias) {
-                        addToObject = false;
-                    }
-                }
-
-                if (addToObject) {
-                    $scope.palettes.push(data);
-                    notificationsService.success("Success", "Palette has been created. Remember to save changes!");
-                }
-                else {
-                    notificationsService.error("Palette alias already exists!");
-                }
-                //$scope.palettes.push({ name: palette.name, alias: palette.alias, colors: palette.colors });
+                  if (addToObject) {
+                      $scope.palettes.push(data);
+                      notificationsService.success("Success", "Palette has been created. Remember to save changes!");
+                      editorService.close();
+                  }
+                  else {
+                      notificationsService.error("Palette alias already exists!");
+                  }
+                  //$scope.palettes.push({ name: palette.name, alias: palette.alias, colors: palette.colors });
+              }
+            },
+            close: function() {
+              editorService.close();
             }
-        }
+        });
     }
 
-    $scope.editPalette = function (palette) {
+  $scope.editPalette = function (palette) {
+
+        event.target.closest('.btn-group').classList.remove('open');
 
         if (editDialog) {
             editDialog.close();
         }
 
-        editDialog = dialogService.open({
-            template: '/App_Plugins/ColorPalettes/views/PaletteEditDialog.html',
+        editDialog = editorService.open({
+            view: '/App_Plugins/ColorPalettes/views/PaletteEditDialog.html',
             show: true,
-            dialogData: palette,
-            callback: done,
-        });
-
-        function done(data) {
-            if (data.name && data.alias && data.colors) {
-
+            size: 'small',
+            editorData: palette,
+            submit: function(data) {
+              if (data.name && data.alias && data.colors) {
                 for (var i = 0; i < $scope.palettes.length; i++) {
-                    if ($scope.palettes[i].alias == data.alias) {
-                        $scope.palettes[i] = { name: data.name, alias: data.alias, colors: data.colors };
-                        break;
-                    }
+                  if ($scope.palettes[i].alias == data.alias) {
+                    $scope.palettes[i] = { name: data.name, alias: data.alias, colors: data.colors };
+                    break;
+                  }
                 }
+
+                editorService.close();
+              }
+            },
+            close: function() {
+              editorService.close();
             }
-        }
+        });
     }
 
     $scope.removePalette = function (palette) {

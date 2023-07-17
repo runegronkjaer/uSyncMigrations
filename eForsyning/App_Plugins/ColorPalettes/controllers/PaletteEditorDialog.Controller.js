@@ -6,7 +6,7 @@
     $scope.palettePlaceholderText = "Enter palette id";
     $scope.showthirdPartyPalette = false;
 
-    $scope.paletteData = angular.copy($scope.dialogData) || {};
+    $scope.paletteData = angular.copy($scope.model.editorData) || {};
 
     if (!$scope.paletteData.name) {
         $scope.paletteData.name = null;
@@ -75,6 +75,9 @@
     $scope.showReqError = false;
     $scope.showReqNoResults = false;
     $scope.showReqPreloader = false;
+
+    $scope.close = $scope.model.close;
+    $scope.submit = $scope.model.submit;
 
     $scope.getPalette = function (id, source) {
         $scope.showReqPreloader = true;

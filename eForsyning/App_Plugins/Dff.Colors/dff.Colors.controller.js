@@ -7,8 +7,8 @@
 
             //alert($routeParams.id);
 
-            DffColorsResource.GetThemeColors($routeParams.id, $scope.addColors).success(function (data) {
-                $scope.colors = data;
+            DffColorsResource.GetThemeColors($routeParams.id, $scope.addColors).then(function (data) {
+                $scope.colors = data.data;
             });
 
             $scope.setActive = function (color) {

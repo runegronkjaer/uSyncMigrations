@@ -4,10 +4,8 @@
 
             $scope.colors = [];
             //alert($routeParams.id);
-
-            DffColorTextResource.GetThemeColors($routeParams.id).success(function (data) {
-                $scope.colors = data;
-                
+          DffColorTextResource.GetThemeColors($routeParams.id).then(function (data) {
+            $scope.colors = data.data;           
             });
 
             $scope.toggleItem = function (color) {
@@ -28,11 +26,5 @@
                     $scope.model.value[3] = "Hvid";
                     $scope.model.value[4] = "Hvid";
                 }
-                
             }
-
         }]);
-
-
-
-

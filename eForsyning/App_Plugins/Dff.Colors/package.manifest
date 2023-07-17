@@ -19,8 +19,11 @@
       }
     }
   ],
-  javascript: [
-    '~/App_Plugins/Dff.Colors/dff.Colors.Controller.js',
-    '~/App_Plugins/Dff.Colors/dff.Colors.Resource.js'
+  "javascript": [
+    "~/App_Plugins/Dff.Colors/dff.Colors.Controller.js",
+    "~/App_Plugins/Dff.Colors/dff.Colors.Resource.js"
+  ],
+  "css": [
+    "~/App_Plugins/Dff.Colors/colors.css"
   ]
 }

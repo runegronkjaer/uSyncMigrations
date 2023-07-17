@@ -4,7 +4,6 @@
 
         assetsService.loadJs("//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js")
 			    .then(function () {
-
 			        $scope.load = false;
 			        $scope.sizes = [];
 			        $scope.LineHeights = [];
@@ -146,13 +145,13 @@
 			        //Load google font
 			        if ($scope.fonts == undefined || $scope.fonts.length == 0) {
 			            $scope.fonts = [];
-			            $http.get('/Umbraco/Api/GoogleFont/load')
-                            .success(function (data) {
+			            $http.get('/umbraco/backoffice/api/GoogleFont/Load')
+										.then(function (data) {
                                 $scope.fonts.push({
                                     family: "-- none --",
                                     variants: {}
                                 });
-                                angular.forEach(data.items, function (value, key) {
+                                angular.forEach(data.data, function (value, key) {
                                     $scope.fonts.push({
                                         family: value.family,
                                         variants: value.variants

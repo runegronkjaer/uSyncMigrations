@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco.resources")
-    .factory("colorPalettesResource", function ($http, $cookieStore) {
+    .factory("colorPalettesResource", function ($http) {
         return {
         	getPalette: function (id, source) {
         		if (source == "colourlovers") {

@@ -28,6 +28,15 @@
     padding: 0;
 }
 
+.palette-container .dropdown-menu {
+  padding: 9px 0 5px;
+  display: none;
+}
+
+.palette-container .open > .dropdown-menu {
+  display: block;
+}
+
 .palette-container table {
 	table-layout: fixed;
 }
@@ -46,7 +55,7 @@
 
 .palette-container .menu-ctrl {
     display: block;
-    padding: 3px 8px;
+    padding: 5px 8px 3px;
 }
 
 .palette-container [ng-click].menu-ctrl:hover {
@@ -373,3 +382,13 @@
 }
 
 .collection-assets-item.hidden-radio input[type="radio"] { display: none; }
+
+.color-palettes-editor-dialog .umb-panel .umb-panel-body {
+  padding: 0 20px;
+}
+
+.color-palettes-editor-dialog .umb-panel .umb-panel-body input.umb-editor {
+  width: 95%;
+  position: relative;
+  box-shadow: none;
+}

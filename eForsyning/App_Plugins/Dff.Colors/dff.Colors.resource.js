@@ -4,7 +4,7 @@ angular.module('umbraco.resources').factory('DffColorsResource',
     	//the factory object returned
     	return {
     		GetThemeColors: function (id, addColors) {
-    			return $http.get('/umbraco/dff/dffapi/GetThemeColors?id=' + id + '&addColors=' + addColors);
+          return $http.get('/umbraco/backoffice/dff/dffapi/GetThemeColors?id=' + id + '&addColors=' + addColors);
     		}
 
     	};
