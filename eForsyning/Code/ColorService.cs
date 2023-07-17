@@ -1,7 +1,5 @@
 ﻿using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Web.Common.UmbracoContext;
-using Umbraco.Cms.Web.Common;
 using DffEdb.Umb.Models;
 
 namespace eForsyning.Code {

@@ -9,6 +9,8 @@
     <Content Remove="uSync\**" />
     <EmbeddedResource Remove="uSync\**" />
     <None Remove="uSync\**" />
+    <Content Include="App_Plugins\**" />
+    <Folder Include="Code\UmbracoModels\" />
   </ItemGroup>
 
   <ItemGroup>

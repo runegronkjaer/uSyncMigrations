@@ -1,6 +1,4 @@
-﻿using Azure;
-using Newtonsoft.Json;
-using System.Net.Http;
+﻿using Newtonsoft.Json;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 
 namespace eForsyning.Code {

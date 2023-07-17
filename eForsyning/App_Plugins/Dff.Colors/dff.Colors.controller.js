@@ -1,32 +1,31 @@
 ﻿angular.module("umbraco")
-    .controller("Dff.Colors.Controller", ['$scope', '$routeParams', 'assetsService', 'notificationsService', 'DffColorsResource',
-        function ($scope, $routeParams, assetsService, notificationsService, DffColorsResource) {
+  .controller("Dff.Colors.Controller", ['$scope', '$routeParams', 'assetsService', 'notificationsService', 'DffColorsResource',
+    function ($scope, $routeParams, assetsService, notificationsService, DffColorsResource) {
+      $scope.colors = [];
+      $scope.addColors = $scope.model.config.addColors;
 
-            $scope.colors = [];
-            $scope.addColors = $scope.model.config.addColors;
+      //alert($routeParams.id);
 
-            //alert($routeParams.id);
+      DffColorsResource.GetThemeColors($routeParams.id, $scope.addColors).then(function (data) {
+        $scope.colors = data.data;
+      });
 
-            DffColorsResource.GetThemeColors($routeParams.id, $scope.addColors).then(function (data) {
-                $scope.colors = data.data;
-            });
+      $scope.setActive = function (color) {
+        if ($scope.model.value !== "" && Number($scope.model.value) === color) {
+          return 'active';
+        }
+      };
 
-            $scope.setActive = function (color) {
-                if ($scope.model.value !== "" && Number($scope.model.value) === color) {
-                    return 'active';
-                } 
-            };
+      $scope.toggleItem = function (color) {
+        if ($scope.model.value == color) {
+          $scope.model.value = "";
+        }
+        else {
+          $scope.model.value = color;
+        }
+      };
 
-            $scope.toggleItem = function (color) {
-                if ($scope.model.value == color) {
-                    $scope.model.value = "";
-                }
-                else {
-                    $scope.model.value = color;
-                }
-            };
-
-        }]);
+    }]);
 
 
 
