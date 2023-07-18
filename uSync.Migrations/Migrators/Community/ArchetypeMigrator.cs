@@ -45,9 +45,10 @@ namespace uSync.Migrations.Migrators.Community {
             continue;
           }
 
+          string? label = !string.IsNullOrEmpty( fieldset.LabelTemplate ) ? fieldset.LabelTemplate : fieldset.Label;
           blocks.Add( new BlockListConfiguration.BlockConfiguration {
             ContentElementTypeKey = contentTypeGuid,
-            Label = fieldset.Label,
+            Label = label,
           } );
         }
       }
@@ -116,8 +117,11 @@ namespace uSync.Migrations.Migrators.Community {
             continue;
           }
 
-          var childProperty = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias,
+          SyncMigrationContentProperty childProperty = new( editorAlias.OriginalEditorAlias,
               keyValue.Value?.ToString() ?? string.Empty );
+
+          childProperty.ContentTypeAlias = contentTypeAlias;
+          childProperty.PropertyAlias = keyValue.Alias;
 
           keyValue.Value = migrator.GetContentValue( childProperty, context );
         }
