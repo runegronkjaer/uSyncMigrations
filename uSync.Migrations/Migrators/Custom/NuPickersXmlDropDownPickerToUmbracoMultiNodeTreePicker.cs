@@ -37,6 +37,18 @@ namespace uSync.Migrations.Migrators.Custom {
           ShowOpen = false,
           IgnoreUserStartNodes = false
         };
+      } else if ( xPath?.Equals( "//cssKlasse" ) == true ) {
+        return new MultiNodePickerConfiguration() {
+          TreeSource = new MultiNodePickerConfigurationTreeSource() {
+            ObjectType = "content",
+            StartNodeQuery = "$root/globalSettings/cssKlasser"
+          },
+          Filter = "cssKlasse",
+          MinNumber = 0,
+          MaxNumber = 1,
+          ShowOpen = false,
+          IgnoreUserStartNodes = false
+        };
       }
 
       return config;
@@ -44,6 +56,13 @@ namespace uSync.Migrations.Migrators.Custom {
 
     public override string GetContentValue( SyncMigrationContentProperty contentProperty, SyncMigrationContext context ) {
       if ( contentProperty.ContentTypeAlias == "eforsyning" && contentProperty.PropertyAlias == "tema" ) {
+        if ( !string.IsNullOrEmpty( contentProperty.Value ) && int.TryParse( contentProperty.Value, out int value ) ) {
+          Guid guid = context.GetKey( value );
+          if ( guid != Guid.Empty ) {
+            return new GuidUdi( "Document", guid ).ToString();
+          }
+        }
+      } else if ( contentProperty.ContentTypeAlias == "customCssBlock" && contentProperty.PropertyAlias == "cssKlasse" ) {
         if ( !string.IsNullOrEmpty( contentProperty.Value ) && int.TryParse( contentProperty.Value, out int value ) ) {
           Guid guid = context.GetKey( value );
           if ( guid != Guid.Empty ) {
