@@ -15,6 +15,7 @@ using uSync.Migrations.Migrators.BlockGrid.BlockMigrators;
 using uSync.Migrations.Migrators.BlockGrid.Extensions;
 using uSync.Migrations.Migrators.BlockGrid.Models;
 using uSync.Migrations.Migrators.Models;
+using uSync.Migrations.Models;
 using static Umbraco.Cms.Core.Models.Property;
 
 namespace uSync.Migrations.Migrators.BlockGrid.Content;
@@ -207,19 +208,26 @@ internal class GridToBlockContentHelper {
         Migrations.Models.EditorAliasInfo? editorAlias = null;
         string? propertyValue = null;
         string? propertyAlias = null;
-        if ( value is JToken valueAsToken ) {
+        if ( value is JObject valueAsObject && valueAsObject.Value<string>( "editorAlias" ) != null ) {
           //If this is hit we have a LeBlender grid element
+
+          string? newDataTypeGuidString = valueAsObject.Value<string>( "dataTypeGuid" );
+          propertyAlias = valueAsObject.Value<string>( "editorAlias" );
+          propertyValue = valueAsObject.Value<object>( "value" )?.ToString();
+          string? propertyName = valueAsObject.Value<string>( "editorName" );
+
+          editorAlias = GetEditorAliasInfo( context, newDataTypeGuidString, propertyAlias );
+          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
+        } else if ( value is JToken valueAsToken ) {
+          //If this is hit we have a LeBlender grid element
+          
           foreach ( JProperty childToken in valueAsToken.Values() ) {
             string? newDataTypeGuidString = childToken.Value["dataTypeGuid"]?.Value<string>();
             propertyAlias = childToken.Value["editorAlias"]?.Value<string>();
             propertyValue = childToken.Value["value"]?.ToString();
             string? propertyName = childToken.Value["editorName"]?.Value<string>();
 
-            if ( Guid.TryParse( newDataTypeGuidString, out Guid newDataTypeGuid ) && !string.IsNullOrEmpty( propertyAlias ) ) {
-              Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
-              string? oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid )?.EditorAlias;
-              editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
-            }
+            editorAlias = GetEditorAliasInfo( context, newDataTypeGuidString, propertyAlias );
             AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
           }
         } else if ( value is string valueAsStr ) {
@@ -237,8 +245,8 @@ internal class GridToBlockContentHelper {
           }
           AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
         } else if ( value is JToken valueAsToken2 ) {
-          //This is the default grid elements
-          Dictionary<string, Dictionary<string, Guid>> allElementTypes = GetAllElementTypeDataTypeKeys();
+          //This is the default grid elements
+          Dictionary<string, Dictionary<string, Guid>> allElementTypes = GetAllElementTypeDataTypeKeys();
           propertyAlias = gridProperty;
           propertyValue = valueAsToken2.ToString();
           if ( allElementTypes.TryGetValue( contentTypeAlias, out Dictionary<string, Guid>? contentTypeProperties ) && contentTypeProperties?.Any() == true ) {
@@ -275,6 +283,16 @@ internal class GridToBlockContentHelper {
     AllElementTypes = _contentTypeService.GetAllElementTypes().ToDictionary( et => et.Alias, et => et );
 
     return AllElementTypes;
+  }
+
+  private EditorAliasInfo? GetEditorAliasInfo( SyncMigrationContext context, string? newDataTypeGuidString, string? propertyAlias ) {
+    if ( Guid.TryParse( newDataTypeGuidString, out Guid newDataTypeGuid ) && !string.IsNullOrEmpty( propertyAlias ) ) {
+      Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
+      string? oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid )?.EditorAlias;
+      return context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
+    }
+
+    return null;
   }
 
   private void AddRawPropertyValues( BlockItemData data, string? propertyAlias, string? propertyValue, Migrations.Models.EditorAliasInfo? editorAlias, SyncMigrationContext context ) {

@@ -3,9 +3,12 @@ using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
+using uSync.Migrations.Composing;
 using uSync.Migrations.Context;
 using uSync.Migrations.Migrators.BlockGrid.Extensions;
+using uSync.Migrations.Migrators.Models;
 using uSync.Migrations.Models;
+using static Umbraco.Cms.Core.Constants.HttpContext;
 
 namespace uSync.Migrations.Migrators.BlockGrid.BlockMigrators;
 
@@ -44,12 +47,18 @@ public abstract class GridBlockMigratorSimpleBase {
         string? description = editorJson.Value<string>( "description" );
 
         if ( !string.IsNullOrEmpty( propAlias ) && !string.IsNullOrEmpty( dataTypeGuidStr ) && Guid.TryParse( dataTypeGuidStr, out Guid dataTypeGuid ) ) {
-          Guid finalDataTypeGuid =  context.DataTypes.GetReplacement( dataTypeGuid );
-          properties.Add(  new NewContentTypeProperty {
+          Guid finalDataTypeGuid = context.DataTypes.GetReplacement( dataTypeGuid );
+          DataTypeInfo? originalDefinition = context.DataTypes.GetByDefinition( dataTypeGuid );
+          ISyncPropertyMigrator? migrator = context.Migrators.TryGetMigrator( originalDefinition?.EditorAlias );
+          string newDataTypeAlias = context.DataTypes.GetAlias( finalDataTypeGuid );
+          string? newEditorAlias = migrator?.GetEditorAlias( new SyncMigrationDataTypeProperty( newDataTypeAlias, originalDefinition?.EditorAlias, "", "" ), context );
+
+          context.ContentTypes.AddProperty( alias, propAlias, dataTypeGuid == finalDataTypeGuid ? originalDefinition?.EditorAlias : null, newEditorAlias );
+          properties.Add( new NewContentTypeProperty {
             Alias = propAlias,
             Name = name ?? propAlias,
             DataTypeGuid = finalDataTypeGuid,
-          });
+          } );
         }
       }
     }
@@ -76,10 +85,49 @@ public abstract class GridBlockMigratorSimpleBase {
     => editorConfig.Alias.GetBlockElementContentTypeAlias( _shortStringHelper );
 
   public virtual Dictionary<string, object> GetPropertyValues( GridValue.GridControl control, SyncMigrationContext context ) {
-    return new Dictionary<string, object>
-    {
-      { control.Editor.Alias, control.Value ?? string.Empty }
-    };
+    //return new Dictionary<string, object>
+    //{
+    //  { control.Editor.Alias, control.Value ?? string.Empty }
+    //};
+
+
+    Dictionary<string, object> propertyValues = new();
+
+    string contentTypeAlias = GetContentTypeAlias( control );
+    if ( string.IsNullOrWhiteSpace( contentTypeAlias ) ) return propertyValues;
+
+    JArray? controlValues = control.Value as JArray;
+    if ( controlValues == null ) return propertyValues;
+
+    foreach ( JObject test in controlValues ) {
+      var elementValue = test.ToObject<IDictionary<string, object>>();
+
+      if ( elementValue == null ) return propertyValues;
+
+      foreach ( var (propertyAlias, value) in elementValue ) {
+        var editorAlias = context.ContentTypes.GetEditorAliasByTypeAndProperty( contentTypeAlias, propertyAlias );
+
+        if ( editorAlias == null ) continue;
+
+        var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
+
+        var propertyValue = value;
+
+        if ( migrator != null ) {
+          var property = new SyncMigrationContentProperty(
+            contentTypeAlias,
+            propertyAlias,
+            editorAlias.OriginalEditorAlias,
+            value?.ToString() ?? string.Empty );
+
+          propertyValue = migrator.GetContentValue( property, context );
+        }
+
+        propertyValues[propertyAlias] = propertyValue;
+      }
+    }
+
+    return propertyValues;
   }
 }
 

@@ -44,8 +44,8 @@ public class RjpMultiUrlPickerToUmbMultiUrlPickerMigrator : SyncPropertyMigrator
             return string.Empty;
         }
 
-        var sourceLinks = contentProperty.Value.IfNotNull(v => JsonConvert.DeserializeObject<List<RjpLinkDto>>(v));
-        if (sourceLinks?.Any() != true)
+        var sourceLinks = contentProperty.Value.IfNotNull(v => JsonConvert.DeserializeObject<RjpLinkDto>(v));
+        if (sourceLinks == null)
         {
             return string.Empty;
         }
@@ -55,53 +55,51 @@ public class RjpMultiUrlPickerToUmbMultiUrlPickerMigrator : SyncPropertyMigrator
         return JsonConvert.SerializeObject(destinationLinks, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
     }
 
-    private static IEnumerable<MultiUrlPickerValueEditor.LinkDto> ConvertLinkDto (IEnumerable<RjpLinkDto> sourceLinks, SyncMigrationContext context)
+    private static IEnumerable<MultiUrlPickerValueEditor.LinkDto> ConvertLinkDto (RjpLinkDto sourceDto, SyncMigrationContext context)
     {
-        foreach (var sourceDto in sourceLinks)
+        var umbLinkDto = new MultiUrlPickerValueEditor.LinkDto {
+            Name = sourceDto.Name.IfNullOrWhiteSpace(null),
+            QueryString = sourceDto.Querystring.IfNullOrWhiteSpace(null),
+            Target = sourceDto.Target.IfNullOrWhiteSpace(null)
+        };
+
+        if (sourceDto.Udi != default)
         {
-            var umbLinkDto = new MultiUrlPickerValueEditor.LinkDto {
-                Name = sourceDto.Name.IfNullOrWhiteSpace(null),
-                QueryString = sourceDto.Querystring.IfNullOrWhiteSpace(null),
-                Target = sourceDto.Target.IfNullOrWhiteSpace(null)
-            };
-
-            if (sourceDto.Udi != default)
-            {
-                umbLinkDto.Udi = sourceDto.Udi;
-            }
-            // In some versions of RJP.MultiUrlPicker, the Id is a Guid
-            else
-            {
-                Guid? key = null;
-
-                if (Guid.TryParse(sourceDto.Id, out var guid))
-                {
-                    key = guid;
-                }
-                // The Id can also be an int.
-                else if (int.TryParse(sourceDto.Id, out var contentId))
-                {
-                    // Attempt to get the Guid of that if it is known
-                    var contentGuid = context.GetKey(contentId);
-                    if (contentGuid != default)
-                    {
-                        key = contentGuid;
-                    }
-                }
-
-                if (key is not null)
-                {
-                    var entityType = sourceDto.IsMedia == true ?
-                        UmbConstants.UdiEntityType.Media :
-                        UmbConstants.UdiEntityType.Document;
-                    umbLinkDto.Udi = new GuidUdi(entityType, key.Value);
-                }
-            }
-
-            umbLinkDto.Url = sourceDto.Url.IfNullOrWhiteSpace(null);
-
-            yield return umbLinkDto;
+            umbLinkDto.Udi = sourceDto.Udi;
         }
+        // In some versions of RJP.MultiUrlPicker, the Id is a Guid
+        else
+        {
+            Guid? key = null;
+
+            if (Guid.TryParse(sourceDto.Id, out var guid))
+            {
+                key = guid;
+            }
+            // The Id can also be an int.
+            else if (int.TryParse(sourceDto.Id, out var contentId))
+            {
+                // Attempt to get the Guid of that if it is known
+                var contentGuid = context.GetKey(contentId);
+                if (contentGuid != default)
+                {
+                    key = contentGuid;
+                }
+            }
+
+            if (key is not null)
+            {
+                var entityType = sourceDto.IsMedia == true ?
+                    UmbConstants.UdiEntityType.Media :
+                    UmbConstants.UdiEntityType.Document;
+                umbLinkDto.Udi = new GuidUdi(entityType, key.Value);
+            }
+        }
+
+        umbLinkDto.Url = sourceDto.Url.IfNullOrWhiteSpace(null);
+
+        yield return umbLinkDto;
+
     }
 
     [DataContract]
