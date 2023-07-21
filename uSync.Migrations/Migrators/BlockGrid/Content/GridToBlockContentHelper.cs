@@ -217,7 +217,12 @@ internal class GridToBlockContentHelper {
           string? propertyName = valueAsObject.Value<string>( "editorName" );
 
           editorAlias = GetEditorAliasInfo( context, newDataTypeGuidString, propertyAlias );
-          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
+          AddRawPropertyValues( data, propertyAlias, propertyValue );
+        } else if ( value is JValue jValue ) {
+          //If this is hit we have a LeBlender grid element
+
+          propertyAlias = gridProperty;
+          AddRawPropertyValues( data, propertyAlias, jValue.Value<string>() );
         } else if ( value is JToken valueAsToken ) {
           //If this is hit we have a LeBlender grid element
 
@@ -228,7 +233,7 @@ internal class GridToBlockContentHelper {
             string? propertyName = childToken.Value["editorName"]?.Value<string>();
 
             editorAlias = GetEditorAliasInfo( context, newDataTypeGuidString, propertyAlias );
-            AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
+            AddRawPropertyValues( data, propertyAlias, propertyValue );
           }
         } else if ( value is string valueAsStr ) {
           //This is the default grid elements
@@ -243,7 +248,7 @@ internal class GridToBlockContentHelper {
 
             }
           }
-          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
+          AddRawPropertyValues( data, propertyAlias, propertyValue );
         } else if ( value is JToken valueAsToken2 ) {
           //This is the default grid elements
           Dictionary<string, Dictionary<string, Guid>> allElementTypes = GetAllElementTypeDataTypeKeys();
@@ -256,7 +261,7 @@ internal class GridToBlockContentHelper {
               editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
             }
           }
-          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
+          AddRawPropertyValues( data, propertyAlias, propertyValue );
         }
 
       } catch ( Exception ex ) {
@@ -295,7 +300,7 @@ internal class GridToBlockContentHelper {
     return null;
   }
 
-  private void AddRawPropertyValues( BlockItemData data, string? propertyAlias, string? propertyValue, Migrations.Models.EditorAliasInfo? editorAlias, SyncMigrationContext context ) {
+  private void AddRawPropertyValues( BlockItemData data, string? propertyAlias, string? propertyValue ) {
     if ( !string.IsNullOrEmpty( propertyAlias ) ) {
       data.RawPropertyValues[propertyAlias] = propertyValue;
     }
