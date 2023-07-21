@@ -1,4 +1,4 @@
-﻿<div ng-controller="Dff.MultiUrlPickerController as ctrl" class="umb-editor umb-contentpicker">
+﻿<div ng-controller="Dff.MultiUrlPickerController as ctrl" class="umb-property-editor umb-contentpicker">
     <ng-form name="multiUrlPickerForm">
 
         <div ui-sortable="ctrl.sortableOptions" ng-model="ctrl.renderModel">
@@ -27,11 +27,11 @@
         <input type="hidden" name="minCount" ng-model="ctrl.renderModel" />
         <input type="hidden" name="maxCount" ng-model="ctrl.renderModel" />
 
-        <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
+        <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount" ng-show="minCount">
             You need to add at least {{model.config.minNumberOfItems}} items
         </div>
 
-        <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">
+        <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount" ng-show="maxCount">
             You can only have {{model.config.maxNumberOfItems}} items selected
         </div>
     </ng-form>

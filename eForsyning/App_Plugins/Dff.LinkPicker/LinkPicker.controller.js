@@ -55,7 +55,7 @@
             angularHelper.getCurrentForm($scope).$setDirty();
         };
 
-        this.openLinkPicker = function(link, $index) {
+      this.openLinkPicker = function (link, $index) {
             var target = link
                 ? {
                     name: link.name,
@@ -75,7 +75,6 @@
                     }
                 }
                 : null;
-
 
             this.linkPickerOverlay = {
                 //view: '/app_plugins/dff.linkpicker/linkpicker.overlay.html',
@@ -147,10 +146,8 @@
     angular.module("umbraco").controller("Dff.Overlays.LinkPickerController",
         function($scope,
             eventsService,
-            dialogService,
             entityResource,
             contentResource,
-            mediaHelper,
             userService,
             localizationService,
             assetsService) {
