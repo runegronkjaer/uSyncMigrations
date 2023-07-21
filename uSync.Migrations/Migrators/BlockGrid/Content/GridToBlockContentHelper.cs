@@ -220,7 +220,7 @@ internal class GridToBlockContentHelper {
           AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
         } else if ( value is JToken valueAsToken ) {
           //If this is hit we have a LeBlender grid element
-          
+
           foreach ( JProperty childToken in valueAsToken.Values() ) {
             string? newDataTypeGuidString = childToken.Value["dataTypeGuid"]?.Value<string>();
             propertyAlias = childToken.Value["editorAlias"]?.Value<string>();
@@ -296,16 +296,7 @@ internal class GridToBlockContentHelper {
   }
 
   private void AddRawPropertyValues( BlockItemData data, string? propertyAlias, string? propertyValue, Migrations.Models.EditorAliasInfo? editorAlias, SyncMigrationContext context ) {
-    if ( editorAlias != null && !string.IsNullOrEmpty( propertyAlias ) ) {
-
-      var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
-      if ( migrator != null ) {
-        var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
-        propertyValue = migrator.GetContentValue( property, context );
-        _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
-      } else {
-        _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
-      }
+    if ( !string.IsNullOrEmpty( propertyAlias ) ) {
       data.RawPropertyValues[propertyAlias] = propertyValue;
     }
   }

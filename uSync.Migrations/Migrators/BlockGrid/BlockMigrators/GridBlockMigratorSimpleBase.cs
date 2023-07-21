@@ -54,10 +54,12 @@ public abstract class GridBlockMigratorSimpleBase {
           string? newEditorAlias = migrator?.GetEditorAlias( new SyncMigrationDataTypeProperty( newDataTypeAlias, originalDefinition?.EditorAlias, "", "" ), context );
 
           context.ContentTypes.AddProperty( alias, propAlias, dataTypeGuid == finalDataTypeGuid ? originalDefinition?.EditorAlias : null, newEditorAlias );
+          context.ContentTypes.AddDataTypeAlias( alias, propAlias, context.DataTypes.GetAlias( finalDataTypeGuid ) );
           properties.Add( new NewContentTypeProperty {
             Alias = propAlias,
             Name = name ?? propAlias,
             DataTypeGuid = finalDataTypeGuid,
+            Description = description ?? "",
           } );
         }
       }
@@ -85,12 +87,6 @@ public abstract class GridBlockMigratorSimpleBase {
     => editorConfig.Alias.GetBlockElementContentTypeAlias( _shortStringHelper );
 
   public virtual Dictionary<string, object> GetPropertyValues( GridValue.GridControl control, SyncMigrationContext context ) {
-    //return new Dictionary<string, object>
-    //{
-    //  { control.Editor.Alias, control.Value ?? string.Empty }
-    //};
-
-
     Dictionary<string, object> propertyValues = new();
 
     string contentTypeAlias = GetContentTypeAlias( control );
@@ -118,7 +114,7 @@ public abstract class GridBlockMigratorSimpleBase {
             contentTypeAlias,
             propertyAlias,
             editorAlias.OriginalEditorAlias,
-            value?.ToString() ?? string.Empty );
+            ( value as JObject )?.Value<object>( "value" ).ToString() ?? string.Empty );
 
           propertyValue = migrator.GetContentValue( property, context );
         }
