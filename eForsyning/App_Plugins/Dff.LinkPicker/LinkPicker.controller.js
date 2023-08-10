@@ -1,7 +1,7 @@
 ﻿(function() {
     "use strict";
 
-    var DffMultiUrlPickerController = function($scope, angularHelper, entityResource, iconHelper) {
+    var DffMultiUrlPickerController = function($scope, angularHelper, entityResource, iconHelper, editorService) {
 
         this.renderModel = [];
 
@@ -78,10 +78,13 @@
 
             this.linkPickerOverlay = {
                 //view: '/app_plugins/dff.linkpicker/linkpicker.overlay.html',
-                view: "/app_plugins/dff.linkpicker/linkpicker.overlay.html?9",
+                view: "/app_plugins/dff.linkpicker/linkpicker.overlay.html?11",
                 currentTarget: target,
-                show: true,
+                size: 'small',
                 submit: function(model) {
+                    if (model.mediaPickerModel.value.length > 0) {
+                        model.target.image = model.mediaPickerModel.value;
+                    }
                     if (model.target.url) {
                         if (link) {
                             if (link.isMedia && link.url === model.target.url) {
@@ -131,11 +134,19 @@
 
                         angularHelper.getCurrentForm($scope).$setDirty();
                     }
-
+                    
                     this.linkPickerOverlay.show = false;
                     this.linkPickerOverlay = null;
+                    editorService.close();
+                }.bind(this),
+                close: function() {
+                    this.linkPickerOverlay.show = false;
+                    this.linkPickerOverlay = null;
+                    editorService.close();
                 }.bind(this)
             };
+            
+          editorService.open(this.linkPickerOverlay);
         };
     };
 
@@ -150,7 +161,7 @@
             contentResource,
             userService,
             localizationService,
-            assetsService) {
+            editorService) {
             var dialogOptions = $scope.model;
 
             var searchText = "Search...";
@@ -159,9 +170,10 @@
             });
 
             if (!$scope.model.title) {
-                $scope.model.title = localizationService.localize("defaultdialogs_selectLink");
+                localizationService.localize("defaultdialogs_selectLink").then((data) => {
+                    $scope.model.title = data;
+                });
             }
-
             $scope.dialogTreeEventHandler = $({});
             $scope.model.target = {};
             $scope.model.target.image = {};
@@ -236,22 +248,29 @@
                     openMiniListView(args.node);
                 }
             }
-
-            $scope.mediaPicker = {
-                view: "mediapicker",
-                value: null, // or your value
-                config: { disableFolderSelect: true, onlyImages: true }
+            
+            $scope.model.mediaPickerModel = {
+                value: [], // or your value
+                config: {
+                    disableFolderSelect: true,
+                    onlyImages: true,
+                    multiple: false,
+                    validationLimit: {
+                        min: null,
+                        max: 1
+                    }
+                }
             };
 
 
             $scope.switchToMediaPicker = function() {
                 userService.getCurrentUser().then(function(userData) {
                     $scope.mediaPickerOverlay = {
-                        view: "mediapicker",
                         startNodeId: userData.startMediaId,
-                        show: true,
+                        disableFolderSelect: true,
+                        onlyImages: true,
                         submit: function(model) {
-                            var media = model.selectedImages[0];
+                            var media = model.selection[0];
 
                             $scope.model.target.id = media.id;
                             $scope.model.target.udi = media.udi;
@@ -261,30 +280,13 @@
 
                             $scope.mediaPickerOverlay.show = false;
                             $scope.mediaPickerOverlay = null;
+                            editorService.close();
+                        },
+                        close: function() {
+                            editorService.close();
                         }
                     };
-                });
-            };
-
-            $scope.switchToMediaPickerImage = function() {
-                userService.getCurrentUser().then(function(userData) {
-                    $scope.mediaPickerOverlay = {
-                        view: "mediapicker",
-                        startNodeId: userData.startMediaId,
-                        show: true,
-                        submit: function(model) {
-                            var media = model.selectedImages[0];
-
-                            $scope.model.target.image.id = media.id;
-                            $scope.model.target.image.udi = media.udi;
-                            $scope.model.target.image.isMedia = true;
-                            $scope.model.target.image.name = media.name;
-                            $scope.model.target.image.url = media.image; 
-
-                            $scope.mediaPickerOverlay.show = false;
-                            $scope.mediaPickerOverlay = null;
-                        }
-                    };
+                    editorService.mediaPicker($scope.mediaPickerOverlay);
                 });
             };
 
@@ -1067,8 +1069,6 @@
                 { value: "fa-youtube-play", label: "&#xf16a; Youtube-Play" },
                 { value: "fa-youtube-square", label: "&#xf166; Youtube-Square" }
             ];
-
-            assetsService.loadCss("/App_Plugins/FontAwesomeIconsDD/assets/font-awesome/css/font-awesome.min.css");
 
         });
 
