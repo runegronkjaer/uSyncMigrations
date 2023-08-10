@@ -55,7 +55,7 @@ public class MediaPickerMigrator : SyncPropertyMigratorBase {
       // If it is a Guid, then `guid` will be assigned and continue on.
       if ( Guid.TryParse( image, out Guid guid ) == false && UdiParser.TryParse<GuidUdi>( image, out var udi ) == true ) {
         guid = udi.Guid;
-      } else if ( Int32.TryParse( image, out int id ) && id > 0 ) {
+      } else if ( int.TryParse( image, out int id ) && id > 0 ) {
         Guid idGuid = context.GetKey( id );
 
         if ( !idGuid.Equals( Guid.Empty ) ) {
