@@ -7,9 +7,11 @@ namespace eForsyning.Code {
   [PluginController( "dff" )]
   public class DffApiController : UmbracoAuthorizedApiController {
     private readonly ColorService _colorService;
+    private readonly SelfService _selfService;
 
-    public DffApiController( ColorService colorService ) {
+    public DffApiController( ColorService colorService, SelfService selfService ) {
       _colorService = colorService;
+      _selfService = selfService;
     }
 
     public List<string> GetThemeColors( int id, int addColors ) {
@@ -30,6 +32,15 @@ namespace eForsyning.Code {
       } else {
         return new List<ColorItem>();
       }
+    }
+
+    /// <summary>
+    /// GetSelfServiceItems
+    /// </summary>
+    /// <param name="id">The id of the current page where selfservice is inserted</param>
+    /// <returns>A list of self service items</returns>
+    public List<SelfServiceItem> GetSelfServiceItems( int id ) {
+      return _selfService.GetSelfServiceItems( id );
     }
   }
 }
