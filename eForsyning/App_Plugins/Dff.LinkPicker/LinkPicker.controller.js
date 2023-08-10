@@ -66,7 +66,7 @@
                     target: link.target,
                     description: link.description,
                     userIcon: link.userIcon,
-                    image: {
+                    image: link.image ?? {
                         id: "",
                         udi: "",
                         isMedia: "",
@@ -82,9 +82,7 @@
                 currentTarget: target,
                 size: 'small',
                 submit: function(model) {
-                    if (model.mediaPickerModel.value.length > 0) {
-                        model.target.image = model.mediaPickerModel.value;
-                    }
+                    model.target.image = model.mediaPickerModel.value[0];
                     if (model.target.url) {
                         if (link) {
                             if (link.isMedia && link.url === model.target.url) {
@@ -102,6 +100,7 @@
                             link.name = model.target.name || model.target.url;
                             link.target = model.target.target;
                             link.url = model.target.url;
+                            link.image = model.target.image;
                         } else {
                             link = {
                                 id: model.target.id,
@@ -111,7 +110,8 @@
                                 udi: model.target.udi,
                                 url: model.target.url,
                                 description: model.target.description,
-                                userIcon: model.target.userIcon
+                                userIcon: model.target.userIcon,
+                                image: model.target.image
                             };
                             this.renderModel.push(link);
                         }
@@ -289,7 +289,7 @@
             }
             
             $scope.model.mediaPickerModel = {
-                value: [], // or your value
+                value: $scope.model.target.image.key ? [$scope.model.target.image] : [], // or your value
                 config: {
                     disableFolderSelect: true,
                     onlyImages: true,
