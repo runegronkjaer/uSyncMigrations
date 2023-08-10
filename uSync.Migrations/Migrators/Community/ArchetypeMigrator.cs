@@ -46,6 +46,11 @@ namespace uSync.Migrations.Migrators.Community {
           }
 
           string? label = !string.IsNullOrEmpty( fieldset.LabelTemplate ) ? fieldset.LabelTemplate : fieldset.Label;
+
+          if (fieldset.Alias == "selfServiceConfig" ) {
+            label = "{{selvbetjeningsMenupunkt | blNodeName}}";
+          }
+
           blocks.Add( new BlockListConfiguration.BlockConfiguration {
             ContentElementTypeKey = contentTypeGuid,
             Label = label,
