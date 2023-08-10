@@ -134,9 +134,11 @@ namespace uSync.Migrations.Migrators.Community {
           values.Add( archetypeValue.Alias, archetypeValue.Value );
         }
 
+        Guid guid = item.Key == Guid.Empty? Guid.NewGuid() : item.Key;
+
         var block = new BlockItemData {
           ContentTypeKey = contentTypeKey,
-          Udi = Udi.Create( Umbraco.Cms.Core.Constants.UdiEntityType.Element, item.Key ),
+          Udi = Udi.Create( Umbraco.Cms.Core.Constants.UdiEntityType.Element, guid ),
           RawPropertyValues = values,
         };
 
