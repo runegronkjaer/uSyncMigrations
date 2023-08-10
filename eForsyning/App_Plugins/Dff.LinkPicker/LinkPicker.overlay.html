@@ -74,10 +74,14 @@
                                     <umb-tree section="content"
                                               hideheader="true"
                                               hideoptions="true"
-                                              eventhandler="dialogTreeEventHandler"
                                               enablelistviewexpand="true"
                                               isdialog="true"
-                                              enablecheckboxes="true">
+                                              on-init="treeInit()"
+                                              customtreeparams="{{model.target.path}}"
+                                              enablecheckboxes="true"
+                                              treealias="content"
+                                              id="treePicker"
+                                              api="dialogTreeApi">
                                     </umb-tree>
                                 </div>
                             </div>

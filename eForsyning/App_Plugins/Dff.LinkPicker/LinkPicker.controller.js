@@ -161,9 +161,48 @@
             contentResource,
             userService,
             localizationService,
+            treeService,
             editorService) {
             var dialogOptions = $scope.model;
 
+            $scope.treeInit = () => {
+                
+                $scope.dialogTreeApi.callbacks.treeNodeSelect((data) => {
+                    console.log('yay?', data);
+                });
+                $scope.dialogTreeApi.callbacks.treeNodeSelect((data) => nodeSelectHandler(null, data));
+
+                $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
+            };
+
+            // this ensures that we only sync the tree once and only when it's ready
+            var oneTimeTreeSync = {
+                executed: false,
+                treeReady: false,
+                sync: function () {
+                    // don't run this if:
+                    // - it was already run once
+                    // - the tree isn't ready yet
+                    // - the model path hasn't been loaded yet
+                    if (this.executed || !this.treeReady || !($scope.model.target && $scope.model.target.path)) {
+                        return;
+                    }
+
+                    this.executed = true;
+                    // sync the tree to the model path
+                    $scope.dialogTreeApi.syncTree({
+                        path: $scope.model.target.path,
+                        tree: "content"
+                    });
+                }
+            };
+            function treeLoadedHandler(args) {
+                oneTimeTreeSync.treeReady = true;
+                oneTimeTreeSync.sync();
+            }
+            
+            $scope.dialogTreeApi = {};
+            
             var searchText = "Search...";
             localizationService.localize("general_search").then(function(value) {
                 searchText = value + "...";
@@ -185,6 +224,8 @@
                 selectedSearchResults: []
             };
 
+            $scope.treeNode = undefined;
+            
             if (dialogOptions.currentTarget) {
                 $scope.model.target = dialogOptions.currentTarget;
 
@@ -198,8 +239,6 @@
 
                         entityResource.getPath(id, "Document").then(function(path) {
                             $scope.model.target.path = path;
-                            //now sync the tree to this path
-                            $scope.dialogTreeEventHandler.syncTree({ path: $scope.model.target.path, tree: "content" });
                         });
                     }
 
