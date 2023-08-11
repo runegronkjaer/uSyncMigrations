@@ -148,20 +148,8 @@
     </div>
 
     <div>
-      <button type="button" class="btn btn-success" ng-click="overlay.show = true">Tilføj nyt formelement</button>
-      <button type="button" class="btn btn-info" ng-click="template.show = true">Vælg template</button>
+      <button type="button" class="btn btn-success" ng-click="openAddFormElement()">Tilføj nyt formelement</button>
+      <button type="button" class="btn btn-info" ng-click="openSelectTemplate()">Vælg template</button>
     </div>
-
-    <umb-overlay ng-if="overlay.show"
-                 model="overlay"
-                 view="overlay.view"
-                 position="right">
-    </umb-overlay>
-
-    <umb-overlay ng-if="template.show"
-                 model="template"
-                 view="template.view"
-                 position="right">
-    </umb-overlay>
   </div>
 </div>

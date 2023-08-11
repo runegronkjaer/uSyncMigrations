@@ -1,12 +1,12 @@
-﻿<div ng-controller="Dff.FormEditor.Elements.Controller" class="cell-tools-menu" ng-style="dialogStyles">
+﻿<div ng-controller="Dff.FormEditor.Elements.Controller">
     <form name="overlayForm" ng-submit="submit(model)">
-    <ul class="umb-card-grid">
-        <li ng-repeat="element in elements" class="-three-in-row" ng-click="selectItem(element)">
-            <a class="umb-card-grid-item">
-                <i class="{{element.Icon}}"></i>
-                {{element.Name}}
-            </a>
-        </li>
-    </ul>
+        <ul class="umb-card-grid -three-in-row">
+            <li ng-repeat="element in elements" ng-click="selectItem(element)">
+                <a class="umb-card-grid-item">
+                    <i class="{{element.Icon}} large"></i>
+                    {{element.Name}}
+                </a>
+            </li>
+        </ul>
     </form>
 </div>

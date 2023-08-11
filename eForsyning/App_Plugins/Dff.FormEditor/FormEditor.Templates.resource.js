@@ -4,7 +4,7 @@ angular.module('umbraco.resources').factory('DffFormTemplateResource',
         //the factory object returned
         return {
             GetFormTemplates: function () {
-                return $http.get('/umbraco/dff/dffapi/getformtemplates');
+                return $http.get('/umbraco/backoffice/dff/dffapi/getformtemplates');
             }
 
         };

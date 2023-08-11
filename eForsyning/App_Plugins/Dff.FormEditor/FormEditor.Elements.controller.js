@@ -1,6 +1,5 @@
 ﻿angular.module("umbraco")
-    .controller("Dff.FormEditor.Elements.Controller", ['$scope', '$routeParams', 'assetsService', 'dialogService',
-        function ($scope, $routeParams, assetsService, dialogService) {
+    .controller("Dff.FormEditor.Elements.Controller", function ($scope) {
 
             $scope.model.hideSubmitButton = true;
 
@@ -54,4 +53,4 @@
 
             }
 
-        }]);
+        });

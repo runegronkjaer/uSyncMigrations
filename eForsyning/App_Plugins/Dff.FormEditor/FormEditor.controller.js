@@ -1,6 +1,5 @@
 ﻿angular.module("umbraco")
-    .controller("Dff.FormEditor.Controller", ['$scope', '$routeParams', 'assetsService', 'notificationsService', 'DffFormResource',
-        function ($scope, $routeParams, assetsService, notificationsService, DffFormResource) {
+    .controller("Dff.FormEditor.Controller", function ($scope, overlayService) {
 
             if (!$scope.model.value) {
                 $scope.model.value = {
@@ -17,43 +16,47 @@
                 $scope.rowDeleteState = !$scope.rowDeleteState;
             }
 
-            $scope.overlay = {
-                view: "/app_plugins/dff.formeditor/formEditor.elements.html",
-                show: false,
-                title: "Vælg formelement",
-                submit: function (model) {
-                    $scope.overlay.show = false;
-                    //$scope.overlay = null;
-                    console.log("Submit");
-                    //alert(model.value.Name);
-                    $scope.addElement(model.value);
-                },
-                close: function (oldModel) {
-                    $scope.overlay.show = false;
-                    //$scope.overlay = null;
-                    console.log("Close");
-                },
-                hideSubmitButton: true
+            $scope.openAddFormElement = function () {
+                var overlayFormElement = {
+                    view: "/app_plugins/dff.formeditor/formEditor.elements.html",
+                    show: false,
+                    title: "Vælg formelement",
+                    submit: function (model) {
+                        console.log("Submit");
+                        $scope.addElement(model.value);
+                        overlayService.close();
+                    },
+                    close: function () {
+                        console.log("Close");
+                        overlayService.close();
+                    },
+                    hideSubmitButton: true,
+                    position: 'right'
+                }
+                overlayService.open(overlayFormElement);
             }
+            $scope.openSelectTemplate = function () {
+                const overlayTemplate = {
+                    view: "/app_plugins/dff.formeditor/formEditor.templates.html?4",
+                    show: false,
+                    title: "Vælg template",
+                    submit: function (model) {
+                        console.log("Submit");
+                        $scope.addTemplate(model.value);
+                        overlayService.close();
+                    },
+                    close: function () {
+                        console.log("Close");
+                        overlayService.close();
+                    },
+                    hideSubmitButton: true,
+                    position: 'right'
+                }
+                overlayService.open(overlayTemplate);
+                
+            }
+            
 
-            $scope.template = {
-                view: "/app_plugins/dff.formeditor/formEditor.templates.html?4",
-                show: false,
-                title: "Vælg template",
-                submit: function (model) {
-                    $scope.template.show = false;
-                    //$scope.overlay = null;
-                    console.log("Submit");
-                    //alert(model.value.Name);
-                    $scope.addTemplate(model.value);
-                },
-                close: function (oldModel) {
-                    $scope.template.show = false;
-                    //$scope.overlay = null;
-                    console.log("Close");
-                },
-                hideSubmitButton: true
-            }
 
 
             $scope.model.hideLabel = true;
@@ -264,7 +267,7 @@
                 }
             };
 
-        }]);
+        });
 
 
 function getFieldSortableOptions() {
