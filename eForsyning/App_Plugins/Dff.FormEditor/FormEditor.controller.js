@@ -84,11 +84,8 @@
             }
 
             $scope.addTemplate = function (template) {
-                //alert(JSON.stringify($scope.model.value.Rows));
-                //alert(template.FormJSON);
                 if (confirm('Er du sikker på at du vil anvende denne template?')) {
-                    $scope.model.value.Rows = $.parseJSON(template.FormJSON);
-                    $scope.model.value.Unassigned = [];
+                    $scope.model.value = $.parseJSON(template.FormJSON);
                 }
             }
 

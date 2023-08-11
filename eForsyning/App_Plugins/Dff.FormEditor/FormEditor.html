@@ -35,14 +35,14 @@
                 <div class="control-group">
                   <label class="control-label">Navn</label>
                   <span ng-show="element.Type != 'headline' && element.Type != 'text'">
-                    <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
+                    <input type="text" class="umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
                   </span>
-                  <input ng-show="element.Type == 'headline'" type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
-                  <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
+                  <input ng-show="element.Type == 'headline'" type="text" class="umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
+                  <textarea ng-show="element.Type == 'text'" class="umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
                 </div>
                 <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
                   <label class="control-label">Forklaring</label>
-                  <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Help" placeholder="Skriv evt. en forklaring til feltet..." />
+                  <input type="text" class="umb-textstring textstring" ng-model="element.Help" placeholder="Skriv evt. en forklaring til feltet..." />
                 </div>
                 <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
                   <label class="control-label">Skal udfyldes</label>
@@ -103,14 +103,14 @@
           <div class="control-group">
             <label class="control-label">Navn</label>
             <span ng-show="element.Type != 'headline' && element.Type != 'text'">
-              <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
+              <input type="text" class="umb-textstring textstring" ng-model="element.Label" placeholder="Skriv navnet på feltet..." />
             </span>
-            <input ng-show="element.Type == 'headline'" type="text" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
-            <textarea ng-show="element.Type == 'text'" class="umb-editor umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
+            <input ng-show="element.Type == 'headline'" type="text" class="umb-textstring textstring" ng-model="element.Label" placeholder="Skriv overskrift her..." />
+            <textarea ng-show="element.Type == 'text'" class="umb-textstring textstring" ng-model="element.Label" placeholder="Skriv tekst her..." rows="6"></textarea>
           </div>
           <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
             <label class="control-label">Forklaring</label>
-            <input type="text" class="umb-editor umb-textstring textstring" ng-model="element.Help" placeholder="Skriv evt. en forklaring til feltet..." />
+            <input type="text" class="umb-textstring textstring" ng-model="element.Help" placeholder="Skriv evt. en forklaring til feltet..." />
           </div>
           <div class="control-group" ng-show="element.Type != 'headline' && element.Type != 'text'">
             <label class="control-label">Skal udfyldes</label>
