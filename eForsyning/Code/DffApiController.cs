@@ -7,9 +7,11 @@ namespace eForsyning.Code {
   [PluginController( "dff" )]
   public class DffApiController : UmbracoAuthorizedApiController {
     private readonly ColorService _colorService;
+    private readonly FormService _formService;
 
-    public DffApiController( ColorService colorService ) {
+    public DffApiController( ColorService colorService, FormService formService ) {
       _colorService = colorService;
+      _formService = formService;
     }
 
     public List<string> GetThemeColors( int id, int addColors ) {
@@ -31,5 +33,11 @@ namespace eForsyning.Code {
         return new List<ColorItem>();
       }
     }
+    
+    public List<FormTemplateViewModel>? GetFormTemplates()
+    {
+      return _formService.GetFormTemplates();
+    }
+    
   }
 }
