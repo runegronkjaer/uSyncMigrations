@@ -1,0 +1,20 @@
+﻿{
+  "gridEditors": [
+    {
+      "name": "Map",
+      "alias": "terratype",
+      "view": "/App_Plugins/Terratype/views/grid.html",
+      "render": "/App_Plugins/Terratype/views/grid.cshtml",
+      "icon": "icon-map-location",
+      "config": {},
+      "editors": [
+        {
+          "name": "Map",
+          "alias": "map",
+          "propretyType": {},
+          "dataType": "e6698dda-6f4b-482e-9fa3-d48c63d1c65c"
+        }
+      ]
+    }
+  ]
+}
