@@ -61,6 +61,18 @@ namespace uSync.Migrations.Migrators.Custom {
           ShowOpen = false,
           IgnoreUserStartNodes = false
         };
+      } else if ( xPath?.Equals( "$ancestorOrSelf/ancestor-or-self::vaerk[position()=1]//data//personKategorier//personKategori" ) == true ) {
+        return new MultiNodePickerConfiguration() {
+          TreeSource = new MultiNodePickerConfigurationTreeSource() {
+            ObjectType = "content",
+            StartNodeQuery = "$current/ancestor-or-self::vaerk[position()=1]//data//personKategorier"
+          },
+          Filter = "personKategori",
+          MinNumber = 0,
+          MaxNumber = 1,
+          ShowOpen = false,
+          IgnoreUserStartNodes = false
+        };
       }
 
       return config;
@@ -82,6 +94,13 @@ namespace uSync.Migrations.Migrators.Custom {
           }
         }
       } else if ( contentProperty.ContentTypeAlias == "BlockElement_formular" && contentProperty.PropertyAlias == "form" ) {
+        if ( !string.IsNullOrEmpty( contentProperty.Value ) && int.TryParse( contentProperty.Value, out int value ) ) {
+          Guid guid = context.GetKey( value );
+          if ( guid != Guid.Empty ) {
+            return new GuidUdi( "Document", guid ).ToString();
+          }
+        }
+      } else if ( contentProperty.ContentTypeAlias == "BlockElement_personerIKategori" && contentProperty.PropertyAlias == "personKategori" ) {
         if ( !string.IsNullOrEmpty( contentProperty.Value ) && int.TryParse( contentProperty.Value, out int value ) ) {
           Guid guid = context.GetKey( value );
           if ( guid != Guid.Empty ) {
