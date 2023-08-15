@@ -1,56 +1,80 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using uSync.Migrations.Context;
 using uSync.Migrations.Extensions;
 using uSync.Migrations.Migrators.Models;
+using uSync.Migrations.Migrators.Models.Custom;
 
 namespace uSync.Migrations.Migrators;
 
-[SyncMigrator("Terratype")]
-public class TerratypeToOpenStreetmapMigrator : SyncPropertyMigratorBase
-{
-    public override string GetEditorAlias(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
-        => "Bergmania.OpenStreetMap";
+[SyncMigrator( "Terratype" )]
+public class TerratypeToOpenStreetmapMigrator : SyncPropertyMigratorBase {
+  public override string GetEditorAlias( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context )
+      => "Bergmania.OpenStreetMap";
 
-    public override object? GetConfigValues(SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context)
-    {
-        var config = new JObject();
+  public override object? GetConfigValues( SyncMigrationDataTypeProperty dataTypeProperty, SyncMigrationContext context ) {
+    var config = new JObject();
 
-        config.Add("allowClear", true);
-        config.Add("defaultPosition", GetPosition(dataTypeProperty.PreValues?.GetPreValueOrDefault("definition", string.Empty) ?? string.Empty));
-        config.Add("showCoordinates", false);
-        config.Add("showSearch", false);
-        config.Add("tileLayer", "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-        config.Add("tileLayerAttribution", "Map data © OpenStreetMap contributors");
+    config.Add( "allowClear", true );
+    config.Add( "defaultPosition", GetPosition( dataTypeProperty.PreValues?.GetPreValueOrDefault( "definition", string.Empty ) ?? string.Empty ) );
+    config.Add( "showCoordinates", false );
+    config.Add( "showSearch", false );
+    config.Add( "tileLayer", "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" );
+    config.Add( "tileLayerAttribution", "Map data © OpenStreetMap contributors" );
 
-        return config;
-    }
+    return config;
+  }
 
-    public JToken GetPosition(string jsonConfig)
-    {
-        var defaultJson = JObject.Parse(DEFAULT_POSITIONVALUE);
+  public JToken GetPosition( string jsonConfig ) {
+    var defaultJson = JObject.Parse( DEFAULT_POSITIONVALUE );
 
-        if (string.IsNullOrWhiteSpace(jsonConfig)) return defaultJson;
+    if ( string.IsNullOrWhiteSpace( jsonConfig ) ) return defaultJson;
 
-        var terraTypeJson = JObject.Parse(jsonConfig);
-        var position = terraTypeJson.Value<JObject>("position");
-        if (position != null)
-        {
-            var cords = position.Value<string>("datum");
-            if (!string.IsNullOrWhiteSpace(cords))
-            {
-                var xy = cords.Split(",");
-                if (xy.Length == 2)
-                {
-                    defaultJson["marker"]!["latitude"] = decimal.Parse(xy[0]);
-                    defaultJson["marker"]!["longitude"] = decimal.Parse(xy[1]);
-                }
-            }
+    var terraTypeJson = JObject.Parse( jsonConfig );
+    var position = terraTypeJson.Value<JObject>( "position" );
+    if ( position != null ) {
+      var cords = position.Value<string>( "datum" );
+      if ( !string.IsNullOrWhiteSpace( cords ) ) {
+        var xy = cords.Split( "," );
+        if ( xy.Length == 2 ) {
+          defaultJson["marker"]!["latitude"] = decimal.Parse( xy[0] );
+          defaultJson["marker"]!["longitude"] = decimal.Parse( xy[1] );
         }
-
-        return defaultJson;
+      }
     }
 
-    private string DEFAULT_POSITIONVALUE = @"{
+    return defaultJson;
+  }
+
+  public override string? GetContentValue( SyncMigrationContentProperty contentProperty, SyncMigrationContext context ) {
+    if ( string.IsNullOrWhiteSpace( contentProperty.Value ) ) {
+      return string.Empty;
+    }
+
+    JObject terraTypeJson = JObject.Parse( contentProperty.Value );
+    JObject? position = terraTypeJson.Value<JObject>( "position" );
+    if ( position != null ) {
+      string? cords = position.Value<string>( "datum" );
+
+      if ( !string.IsNullOrWhiteSpace( cords ) ) {
+        var xy = cords.Split( "," );
+        if ( xy.Length == 2 ) {
+
+          TerratypeValue terratypeValue = new() {
+            Marker = new MapPoint() { Latitude = decimal.Parse( xy[0] ), Longitude = decimal.Parse( xy[1] ) },
+            Zoom = terraTypeJson.Value<int>( "zoom" ),
+            BoundingBox = new BoundingBox() { SouthWestCorner = new() { Latitude = 55.3648687459637m, Longitude = 10.3075790405273m }, NorthEastCorner = new() { Latitude = 55.4331042620063m, Longitude = 10.4534912109375m } }
+          };
+
+          return JsonConvert.SerializeObject( terratypeValue, Formatting.Indented );
+        }
+      }
+    }
+
+    return "";
+  }
+
+  private string DEFAULT_POSITIONVALUE = @"{
         ""boundingBox"": {
             ""northEastCorner"": { ""latitude"": 55.4331042620063, ""longitude"": 10.4534912109375 },
             ""southWestCorner"": { ""latitude"": 55.3648687459637, ""longitude"": 10.3075790405273 }

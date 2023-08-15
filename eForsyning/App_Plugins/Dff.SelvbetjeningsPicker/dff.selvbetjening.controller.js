@@ -1,14 +1,9 @@
 ﻿angular.module("umbraco")
-    .controller("Dff.Selvbetjening.Controller", ['$scope', '$routeParams', 'assetsService', 'notificationsService', 'DffSelvbetjeningResource',
-        function ($scope, $routeParams, assetsService, notificationsService, DffSelvbetjeningResource) {
+  .controller("Dff.Selvbetjening.Controller", ['$scope', '$routeParams', 'assetsService', 'notificationsService', 'DffSelvbetjeningResource',
+    function ($scope, $routeParams, assetsService, notificationsService, DffSelvbetjeningResource) {
+      $scope.items = [];
 
-            $scope.items = [];
-
-            DffSelvbetjeningResource.GetSelfServiceItems($routeParams.id).success(function (data) {
-                $scope.items = data;
-            });
-        }]);
-
-
-
-
+      DffSelvbetjeningResource.GetSelfServiceItems($routeParams.id).then(function (data) {
+        $scope.items = data.data;
+      });
+    }]);

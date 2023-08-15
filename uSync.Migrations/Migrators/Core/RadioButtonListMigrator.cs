@@ -41,10 +41,16 @@ public class RadioButtonListMigrator : SyncPropertyMigratorBase {
     string dataTypeAlias = context.ContentTypes.GetDataTypeAlias( contentProperty.ContentTypeAlias, contentProperty.PropertyAlias );
     Dictionary<string, object> values = context.Migrators.GetCustomValues( $"radio_{dataTypeAlias}" );
 
-    if ( !string.IsNullOrEmpty( contentProperty.Value ) && values.TryGetValue( contentProperty.Value, out object? value ) ) {
-      string? valueStr = value?.ToString();
-      if ( valueStr != null ) {
-        return valueStr;
+    if ( !string.IsNullOrEmpty( contentProperty.Value ) ) {
+      if ( values.TryGetValue( contentProperty.Value, out object? value ) ) {
+        string? valueStr = value?.ToString();
+        if ( valueStr != null ) {
+          return valueStr;
+        }
+      }
+
+      if ( values.Any( v => v.Value.ToString() == contentProperty.Value ) ) {
+        return contentProperty.Value;
       }
     }
 

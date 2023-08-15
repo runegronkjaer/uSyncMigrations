@@ -7,10 +7,12 @@ namespace eForsyning.Code {
   [PluginController( "dff" )]
   public class DffApiController : UmbracoAuthorizedApiController {
     private readonly ColorService _colorService;
+    private readonly SelfService _selfService;
     private readonly FormService _formService;
 
-    public DffApiController( ColorService colorService, FormService formService ) {
+    public DffApiController( ColorService colorService, SelfService selfService, FormService formService ) {
       _colorService = colorService;
+      _selfService = selfService;
       _formService = formService;
     }
 
@@ -32,6 +34,15 @@ namespace eForsyning.Code {
       } else {
         return new List<ColorItem>();
       }
+    }
+
+    /// <summary>
+    /// GetSelfServiceItems
+    /// </summary>
+    /// <param name="id">The id of the current page where selfservice is inserted</param>
+    /// <returns>A list of self service items</returns>
+    public List<SelfServiceItem> GetSelfServiceItems( int id ) {
+      return _selfService.GetSelfServiceItems( id );
     }
     
     public List<FormTemplateViewModel>? GetFormTemplates()

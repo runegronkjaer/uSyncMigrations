@@ -1,5 +1,5 @@
 ﻿<div class="seo-metadata-container" ng-controller="Dff.Selvbetjening.Controller">
-    <select ng-model="model.value" ng-options="item as item.Name for item in items track by item.Id">
-        <!--<option ng-repeat="item in items" value="{{item.Id}}">{{item.Name}}</option>-->
-    </select>
+  <select ng-model="model.value">
+    <option ng-repeat="item in items" value="{{item.Udi}}">{{item.Name}}</option>
+  </select>
 </div>
