@@ -21,13 +21,6 @@ internal class MediaMigrationHandler : ContentBaseMigrationHandler<Media>, ISync
         ILogger<MediaMigrationHandler> logger)
         : base(eventAggregator, migrationFileService, shortStringHelper, logger)
     {
-        _ignoredProperties.UnionWith(new[]
-        {
-            UmbConstants.Conventions.Media.Bytes,
-            UmbConstants.Conventions.Media.Extension,
-            UmbConstants.Conventions.Media.Height,
-            UmbConstants.Conventions.Media.Width,
-        });
 
         _mediaTypeAliasForFileExtension.Union(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {

@@ -3,7 +3,7 @@
     "IIS": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "http://migration.cpt.dk.localhost/",
+      "launchUrl": "http://migration.usync.cpt.dk.localhost/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -30,7 +30,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://migration.cpt.dk.localhost/",
+      "applicationUrl": "http://migration.usync.cpt.dk.localhost/",
       "sslPort": 0
     },
     "iisExpress": {

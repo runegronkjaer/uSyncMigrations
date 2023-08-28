@@ -63,6 +63,10 @@ public class MediaPickerMigrator : SyncPropertyMigratorBase
             {
                 guid = udi.Guid;
             }
+
+            if ( int.TryParse( image, out int imageId ) ) {
+              guid = context.GetKey( imageId );
+            }
          
             if (guid.Equals(Guid.Empty) == false)
             {

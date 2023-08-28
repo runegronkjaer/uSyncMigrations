@@ -78,6 +78,8 @@ internal abstract class MigrationHandlerBase<TObject>
       return;
     }
 
+    context.ContentTypes.AddProperty( "BlockElement_focalpointImage", "image", "Novicell.FocalPoint", UmbConstants.PropertyEditors.Aliases.MediaPicker3 );
+
     foreach ( var file in files ) {
       var source = XElement.Load( file );
       PrepareFile( source, context );

@@ -1,0 +1,7 @@
+﻿<div ng-controller="Novicell.IconPicker">
+    <div ng-click="openIconPicker()" class="icon-picker-editor">
+        <svg ng-if="model.value.length"><use xmlns:xlink="http://www.w3.org/1999/xlink" href="/dist/icons/icons.svg#{{model.value}}"></use></svg>
+        <h4 ng-if="!model.value.length">Select icon</h4>
+    </div>
+    <!--<textarea ng-model="model.value"></textarea>-->
+</div>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Html;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,6 +16,7 @@ using uSync.Migrations.Migrators.BlockGrid.BlockMigrators;
 using uSync.Migrations.Migrators.BlockGrid.Extensions;
 using uSync.Migrations.Migrators.BlockGrid.Models;
 using uSync.Migrations.Migrators.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static Umbraco.Cms.Core.Models.Property;
 
 namespace uSync.Migrations.Migrators.BlockGrid.Content;
@@ -207,8 +209,9 @@ internal class GridToBlockContentHelper {
         Migrations.Models.EditorAliasInfo? editorAlias = null;
         string? propertyValue = null;
         string? propertyAlias = null;
-        if ( value is JToken valueAsToken ) {
+        if ( value is JToken valueAsToken && valueAsToken.Values().Any() ) {
           //If this is hit we have a LeBlender grid element
+          var test = valueAsToken.Values();
           foreach ( JProperty childToken in valueAsToken.Values() ) {
             string? newDataTypeGuidString = childToken.Value["dataTypeGuid"]?.Value<string>();
             propertyAlias = childToken.Value["editorAlias"]?.Value<string>();
@@ -219,7 +222,11 @@ internal class GridToBlockContentHelper {
               Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
               string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
               editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
+              if ( editorAlias == null ) {
+                editorAlias = context.ContentTypes.GetEditorAliasByTypeAndProperty( "BlockElement_focalpointImage", propertyAlias );
+              }
             }
+            AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
           }
         } else if ( value is string valueAsStr ) {
           //This is the default grid elements
@@ -234,20 +241,24 @@ internal class GridToBlockContentHelper {
 
             }
           }
-        }
+          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
+        } else if ( value is JToken valueAsToken2 ) {
+          //This is the default grid elements
+          Dictionary<string, Dictionary<string, Guid>> allElementTypes = GetAllElementTypeDataTypeKeys();
+          propertyAlias = gridProperty;
+          propertyValue = valueAsToken2.ToString();
+          if ( allElementTypes.TryGetValue( contentTypeAlias, out Dictionary<string, Guid>? contentTypeProperties ) && contentTypeProperties?.Any() == true ) {
+            if ( contentTypeProperties.TryGetValue( propertyAlias, out Guid newDataTypeGuid ) ) {
+              Guid oldDataTypeGuid = context.DataTypes.GetReplacement( newDataTypeGuid );
+              string oldEditorAlias = context.DataTypes.GetByDefinition( oldDataTypeGuid );
+              editorAlias = context.ContentTypes.GetEditorAliasByNewEditorAlias( oldEditorAlias );
 
-        if ( editorAlias != null && !string.IsNullOrEmpty( propertyAlias ) ) {
-
-          var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
-          if ( migrator != null ) {
-            var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
-            propertyValue = migrator.GetContentValue( property, context );
-            _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
-          } else {
-            _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
+            }
           }
-          data.RawPropertyValues[propertyAlias] = propertyValue;
+          AddRawPropertyValues( data, propertyAlias, propertyValue, editorAlias, context );
         }
+
+
 
       } catch ( Exception ex ) {
         throw new Exception( $"gridProperty: {gridProperty} - value: {value}", ex );
@@ -273,6 +284,21 @@ internal class GridToBlockContentHelper {
     AllElementTypes = _contentTypeService.GetAllElementTypes().ToDictionary( et => et.Alias, et => et );
 
     return AllElementTypes;
+  }
+
+  private void AddRawPropertyValues( BlockItemData data, string? propertyAlias, string? propertyValue, Migrations.Models.EditorAliasInfo? editorAlias, SyncMigrationContext context ) {
+    if ( editorAlias != null && !string.IsNullOrEmpty( propertyAlias ) ) {
+
+      var migrator = context.Migrators.TryGetMigrator( editorAlias.OriginalEditorAlias );
+      if ( migrator != null ) {
+        var property = new SyncMigrationContentProperty( editorAlias.OriginalEditorAlias, propertyValue ?? string.Empty );
+        propertyValue = migrator.GetContentValue( property, context );
+        _logger.LogDebug( "Migrator: {migrator} returned {value}", migrator.GetType().Name, propertyValue );
+      } else {
+        _logger.LogDebug( "No Block Migrator found for [{alias}] (value will be passed through)", editorAlias.OriginalEditorAlias );
+      }
+      data.RawPropertyValues[propertyAlias] = propertyValue;
+    }
   }
 }
 

@@ -1,0 +1,17 @@
+﻿{
+  propertyEditors:[
+    {
+      name: "Novicell Icon Picker",
+      alias: "Novicell.IconPicker",
+      isParameterEditor: true,
+      editor: {
+        view: "~/App_Plugins/NcIconPicker/views/IconPicker.view.html",
+        valueType: "JSON"
+      }
+    }
+  ],
+  javascript: [
+    "~/App_Plugins/NcIconPicker/controllers/NcIconPicker.controller.js",
+	"~/App_Plugins/NcIconPicker/controllers/NcIconPickerDialog.controller.js",
+  ]
+}

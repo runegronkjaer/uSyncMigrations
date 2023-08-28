@@ -6,7 +6,6 @@ using uSync.Migrations.Migrators.Models;
 
 namespace uSync.Migrations.Migrators;
 
-[SyncMigrator("Umbraco.ContentPickerAlias")]
 [SyncMigrator("Umbraco.ContentPicker2")]
 public class ContentPicker1Migrator : SyncPropertyMigratorBase
 {

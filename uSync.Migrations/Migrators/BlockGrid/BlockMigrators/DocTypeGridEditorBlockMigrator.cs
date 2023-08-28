@@ -2,7 +2,6 @@
 
 using Newtonsoft.Json.Linq;
 
-using Polly;
 
 using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Models;

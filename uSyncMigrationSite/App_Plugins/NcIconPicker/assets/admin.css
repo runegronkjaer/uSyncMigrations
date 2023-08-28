@@ -1,0 +1,62 @@
+﻿.icon-picker-editor {
+    padding: 10px; 
+    font-size: 20px; 
+    background: rgb(249, 249, 249) none repeat scroll 0% 0%; 
+    margin: 10px; 
+    border: 1px dashed rgb(204, 204, 204);
+    width: 120px;
+}
+
+.icon-picker-editor:hover {
+    cursor: pointer;
+}
+
+    .icon-picker-editor h4 {
+        text-align: center;
+        font-size: 14px;
+        margin: 2px;
+        text-transform: uppercase;
+        color: #aaa;
+        font-family: Montserrat,sans-serif;
+    }
+
+    .icon-picker-editor svg {
+        height: 40px;
+        width: 40px;
+        margin: 0px auto;
+        display: block;
+        fill: #333;
+    }
+
+    .icon-picker-editor:hover svg {
+        fill: #aaa;
+    }
+
+.icon-container {
+    
+}
+
+    .icon-container .icon-item {
+        display: block;
+        height: 100px;
+        width: 100px;
+        background: #f8f8f8;
+        margin: 4px;
+        float: left;
+    }
+
+    .icon-container .icon-item:hover {
+        background-color:#444;
+        cursor: pointer;
+    }
+
+        .icon-container .icon-item:hover svg {
+            fill: white;
+        }
+
+        .icon-container .icon-item svg {
+            height: 40px;
+            width: 40px;
+            display: block;
+            margin: 30px auto 0 auto;
+        }

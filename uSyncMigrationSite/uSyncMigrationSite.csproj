@@ -1,15 +1,82 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="App_Plugins\NcAccordion\**" />
+	  <Compile Remove="App_Plugins\NcBackoffice\**" />
+	  <Compile Remove="App_Plugins\NcContainerUtilities\**" />
+	  <Compile Remove="App_Plugins\NcDirectives\**" />
+	  <Compile Remove="App_Plugins\NcLinkPicker\**" />
+	  <Compile Remove="App_Plugins\NcPainter\**" />
+	  <Compile Remove="App_Plugins\NcResponsiveUtilities\**" />
+	  <Compile Remove="App_Plugins\NcTheme\**" />
+	  <Content Remove="App_Plugins\NcAccordion\**" />
+	  <Content Remove="App_Plugins\NcBackoffice\**" />
+	  <Content Remove="App_Plugins\NcContainerUtilities\**" />
+	  <Content Remove="App_Plugins\NcDirectives\**" />
+	  <Content Remove="App_Plugins\NcLinkPicker\**" />
+	  <Content Remove="App_Plugins\NcPainter\**" />
+	  <Content Remove="App_Plugins\NcResponsiveUtilities\**" />
+	  <Content Remove="App_Plugins\NcTheme\**" />
+	  <EmbeddedResource Remove="App_Plugins\NcAccordion\**" />
+	  <EmbeddedResource Remove="App_Plugins\NcBackoffice\**" />
+	  <EmbeddedResource Remove="App_Plugins\NcContainerUtilities\**" />
+	  <EmbeddedResource Remove="App_Plugins\NcDirectives\**" />
+	  <EmbeddedResource Remove="App_Plugins\NcLinkPicker\**" />
+	  <EmbeddedResource Remove="App_Plugins\NcPainter\**" />
+	  <EmbeddedResource Remove="App_Plugins\NcResponsiveUtilities\**" />
+	  <EmbeddedResource Remove="App_Plugins\NcTheme\**" />
+	  <None Remove="App_Plugins\NcAccordion\**" />
+	  <None Remove="App_Plugins\NcBackoffice\**" />
+	  <None Remove="App_Plugins\NcContainerUtilities\**" />
+	  <None Remove="App_Plugins\NcDirectives\**" />
+	  <None Remove="App_Plugins\NcLinkPicker\**" />
+	  <None Remove="App_Plugins\NcPainter\**" />
+	  <None Remove="App_Plugins\NcResponsiveUtilities\**" />
+	  <None Remove="App_Plugins\NcTheme\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishMigrationSite.pubxml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\bergmania.openstreetmap.html" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lang\da-DK.xml" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lang\en-US.xml" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lib\autocomplete\css\autocomplete.css" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\images\layers-2x.png" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\images\layers.png" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\images\marker-icon-2x.png" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\images\marker-icon.png" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\images\marker-shadow.png" />
+	  <Content Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\leaflet.css" />
+	  <Content Include="App_Plugins\NcIconPicker\assets\admin.css" />
+	  <Content Include="App_Plugins\NcIconPicker\lib\data.json" />
+	  <Content Include="App_Plugins\NcIconPicker\views\IconList.view.html" />
+	  <Content Include="App_Plugins\NcIconPicker\views\IconPicker.view.html" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="App_Plugins\Bergmania.OpenStreetMap\bergmania.openstreetmap.controller.js" />
+	  <None Include="App_Plugins\Bergmania.OpenStreetMap\lib\autocomplete\js\autocomplete.js" />
+	  <None Include="App_Plugins\Bergmania.OpenStreetMap\lib\autocomplete\js\autocomplete.min.js" />
+	  <None Include="App_Plugins\Bergmania.OpenStreetMap\lib\autocomplete\js\autocomplete.umd.min.js" />
+	  <None Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\leaflet-src.esm.js" />
+	  <None Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\leaflet-src.esm.js.map" />
+	  <None Include="App_Plugins\Bergmania.OpenStreetMap\lib\leaflet\leaflet-src.js" />
+	  <None Include="App_Plugins\Bergmania.OpenStreetMap\package.manifest" />
+	  <None Include="App_Plugins\NcIconPicker\controllers\nciconpicker.controller.js" />
+	  <None Include="App_Plugins\NcIconPicker\controllers\NcIconPickerDialog.controller.js" />
+	  <None Include="App_Plugins\NcIconPicker\lib\icons.svg" />
+	  <None Include="App_Plugins\NcIconPicker\package.manifest" />
+	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Umbraco.Cms" Version="10.4.0" />
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="7.0.1" />
+		<PackageReference Include="Umbraco.Cms" Version="11.3.1" />
 		<PackageReference Include="Umbraco.TheStarterKit" Version="10.0.0" />
 		<PackageReference Include="uSync" Version="10.3.4-build.20230315.1" />
-		<PackageReference Include="Umbraco.Forms" Version="10.2.0" />
 		<PackageReference Include="Our.Umbraco.DocTypeGridEditor" Version="10.0.1" />
 	</ItemGroup>
 
@@ -18,6 +85,12 @@
 		<PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
 		<ProjectReference Include="..\uSync.Migrations\uSync.Migrations.csproj" />
 		<RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="config\grid.editors.config.js">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 	<PropertyGroup>

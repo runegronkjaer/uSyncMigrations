@@ -1,0 +1,23 @@
+﻿<div class="list-panel ng-scope" ng-controller="Novicell.IconPickerDialog">
+  <umb-editor-view>
+    <umb-editor-container>
+      <h3 class="ng-binding">NC Icon Picker</h3>
+      <em>Pick your icon below</em>
+      <div class="icon-container">
+        <div class="icon-item" ng-repeat="icon in model.icons" ng-model="icon" ng-click="setIcon(icon)">
+          <svg class="progress-icon vertical-align"><use xmlns:xlink="http://www.w3.org/1999/xlink" href="/dist/icons/icons.svg#{{icon}}"></use></svg>
+        </div>
+      </div>
+    </umb-editor-container>
+    <umb-editor-footer>
+      <umb-editor-footer-content-right>
+        <umb-button type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="close()">
+        </umb-button>
+      </umb-editor-footer-content-right>
+    </umb-editor-footer>
+  </umb-editor-view>
+</div>
