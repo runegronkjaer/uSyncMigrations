@@ -1,5 +1,8 @@
 ﻿using System.Data;
-
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
+using Lucene.Net.Util;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json.Linq;
@@ -25,12 +28,12 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
     _logger = logger;
   }
 
-  public void AddLayoutBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
+  public void AddLayoutBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context, string dataTypeAlias, List<NewContentTypeProperty> configRowProperties ) {
     // gather all the layout blocks we can from the templates 
     // and layouts sections of the config. 
     GetTemplateLayouts( gridBlockContext.GridConfiguration.GetItemBlock( "templates" ), gridBlockContext, context );
 
-    GetLayoutLayouts( gridBlockContext.GridConfiguration.GetItemBlock( "layouts" ), gridBlockContext, context );
+    GetLayoutLayouts( gridBlockContext.GridConfiguration.GetItemBlock( "layouts" ), gridBlockContext, context, dataTypeAlias, configRowProperties );
 
     AddContentTypesForLayoutBlocks( gridBlockContext, context );
   }
@@ -119,11 +122,27 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
     }
   }
 
-  private void GetLayoutLayouts( JToken? layouts, GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
+  private void GetLayoutLayouts( JToken? layouts, GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context, string dataTypeAlias, List<NewContentTypeProperty> configRowProperties ) {
     if ( layouts == null ) return;
 
     var gridLayoutConfigurations = layouts
         .ToObject<IEnumerable<GridLayoutConfiguration>>() ?? Enumerable.Empty<GridLayoutConfiguration>();
+
+    Guid? settingKey = null;
+    if ( configRowProperties.Count > 0 ) {
+      string friendlyAlias = GetFriendlyUrl( dataTypeAlias ) + "RowSettings";
+      settingKey = context.GetContentTypeKeyOrDefault( friendlyAlias, friendlyAlias.ToGuid() );
+      context.ContentTypes.AddNewContentType( new() {
+        Key = (Guid)settingKey,
+        Alias = friendlyAlias,
+        Name = dataTypeAlias + " - Settings (row)",
+        Description = "Grid row setting",
+        Folder = "BlockGrid/Settings",
+        Icon = "icon-brush color-purple",
+        IsElement = true,
+        Properties = configRowProperties
+      } );
+    }
 
     foreach ( var layout in gridLayoutConfigurations ) {
       if ( layout.Areas == null ) continue;
@@ -168,6 +187,7 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
         Label = layout?.Name,
         Areas = rowAreas.ToArray(),
         ContentElementTypeKey = context.GetContentTypeKeyOrDefault( contentTypeAlias, contentTypeAlias.ToGuid() ),
+        SettingsElementTypeKey = settingKey,
         GroupKey = gridBlockContext.LayoutsGroup.Key.ToString(),
         BackgroundColor = Grid.LayoutBlocks.Background,
         IconColor = Grid.LayoutBlocks.Icon,
@@ -185,7 +205,6 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
         IsElement = true
       } );
     }
-
   }
 
   private void AddContentTypesForLayoutBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
@@ -227,7 +246,38 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
     }
   }
 
+  private static string RemoveAccent( string text ) {
+    string normalizedString = text.Normalize( NormalizationForm.FormD );
+    StringBuilder stringBuilder = new();
 
+    foreach ( char c in normalizedString ) {
+      UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory( c );
+      if ( unicodeCategory != UnicodeCategory.NonSpacingMark ) {
+        stringBuilder.Append( c );
+      }
+    }
 
+    return stringBuilder.ToString().Normalize( NormalizationForm.FormC );
+  }
 
+  private static string GetFriendlyUrl( string url ) {
+    if ( string.IsNullOrWhiteSpace( url ) ) {
+      return "";
+    }
+
+    url = url.ToLowerInvariant();
+    url = url.Replace( "æ", "ae" );
+    url = url.Replace( "ø", "oe" );
+    url = url.Replace( "å", "aa" );
+    url = RemoveAccent( url );
+    url = Regex.Replace( url, @"[^a-z0-9\s-/]", "" ); // Remove all non valid chars          
+    url = Regex.Replace( url, @"\s+", " " ).Trim(); // convert multiple spaces into one space  
+    url = Regex.Replace( url, @"\s", "-" ); // //Replace spaces by dashes
+
+    while ( url.Contains( "--" ) ) {
+      url = url.Replace( "--", "-" );
+    }
+
+    return url;
+  }
 }

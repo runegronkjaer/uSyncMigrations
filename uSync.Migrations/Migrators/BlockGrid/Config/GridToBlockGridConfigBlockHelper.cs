@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-
 using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
@@ -53,9 +52,9 @@ internal class GridToBlockGridConfigBlockHelper {
     }
   }
 
-  public void AddContentBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
+  public void AddContentBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context, Guid? settingKey ) {
     // add the grid elements to the block config 
-    var gridContentTypeKeys = AddGridContentBlocksToConfig( gridBlockContext.GridConfig, gridBlockContext, context );
+    var gridContentTypeKeys = AddGridContentBlocksToConfig( gridBlockContext.GridConfig, gridBlockContext, context, settingKey );
 
     // now add the editor to the right bit of the blocks.
     AddEditorsToAllowedAreasInBlocks( gridContentTypeKeys, gridBlockContext, context );
@@ -95,7 +94,7 @@ internal class GridToBlockGridConfigBlockHelper {
   /// <summary>
   ///  returns all the allowed/known content types for a section of the grid.
   /// </summary>
-  private Dictionary<string, Guid[]> AddGridContentBlocksToConfig( IGridConfig gridConfig, GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
+  private Dictionary<string, Guid[]> AddGridContentBlocksToConfig( IGridConfig gridConfig, GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context, Guid? settingKey ) {
     var referencedEditors = gridBlockContext.AllEditors().ToList();
 
     var allowedContentTypes = new Dictionary<string, Guid[]>();
@@ -106,7 +105,8 @@ internal class GridToBlockGridConfigBlockHelper {
     foreach ( var editor in editors ) {
       var blocks = editor.ConvertToBlockGridBlocks( context,
           _syncBlockMigrators,
-          gridBlockContext.GridBlocksGroup.Key ).ToList();
+          gridBlockContext.GridBlocksGroup.Key,
+          settingKey ).ToList();
 
       _logger.LogDebug( "Adding {editor} to block config for {count} blocks", editor.Alias, blocks.Count );
 
@@ -123,15 +123,15 @@ internal class GridToBlockGridConfigBlockHelper {
     return allowedContentTypes;
   }
 
-  public void AddRootBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
+  public void AddRootBlocks( GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context, Guid? settingKey ) {
     // add the grid elements to the block config 
-    var gridContentTypeKeys = AddGridRootBlocksToConfig( gridBlockContext.GridConfig, gridBlockContext, context );
+    var gridContentTypeKeys = AddGridRootBlocksToConfig( gridBlockContext.GridConfig, gridBlockContext, context, settingKey );
   }
 
   /// <summary>
   ///  returns all the allowed/known content types for a section of the grid.
   /// </summary>
-  private Dictionary<string, Guid[]> AddGridRootBlocksToConfig( IGridConfig gridConfig, GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context ) {
+  private Dictionary<string, Guid[]> AddGridRootBlocksToConfig( IGridConfig gridConfig, GridToBlockGridConfigContext gridBlockContext, SyncMigrationContext context, Guid? settingKey ) {
     List<string> referencedEditors = gridBlockContext.GetRootAllowedLayouts().ToList();
 
     var allowedContentTypes = new Dictionary<string, Guid[]>();
@@ -142,7 +142,8 @@ internal class GridToBlockGridConfigBlockHelper {
     foreach ( IGridEditorConfig? editor in editors ) {
       List<BlockGridConfiguration.BlockGridBlockConfiguration> blocks = editor.ConvertToBlockGridBlocks( context,
           _syncBlockMigrators,
-          Guid.Empty ).ToList();
+          Guid.Empty,
+          settingKey ).ToList();
 
       _logger.LogDebug( "Adding {editor} to block config for {count} blocks", editor.Alias, blocks.Count );
 

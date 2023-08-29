@@ -1,10 +1,6 @@
-﻿using System.Text.RegularExpressions;
-
-using Newtonsoft.Json.Linq;
-
+﻿using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 using uSync.Migrations.Context;
 using uSync.Migrations.Migrators.BlockGrid.BlockMigrators;
@@ -48,7 +44,7 @@ internal static class GridConfigurationExtensions
     /// <summary>
     ///  Converts a GriddEditorConfig into a BlockGridBlock 
     /// </summary>
-    public static IEnumerable<BlockGridConfiguration.BlockGridBlockConfiguration> ConvertToBlockGridBlocks(this IGridEditorConfig editorConfig, SyncMigrationContext context, SyncBlockMigratorCollection blockMigrators, Guid groupKey)
+    public static IEnumerable<BlockGridConfiguration.BlockGridBlockConfiguration> ConvertToBlockGridBlocks(this IGridEditorConfig editorConfig, SyncMigrationContext context, SyncBlockMigratorCollection blockMigrators, Guid groupKey, Guid? settingKey)
     {
         foreach (var allowedAlias in editorConfig.GetAllowedContentTypeAliasesForBlock(context, blockMigrators))
         {
@@ -58,6 +54,7 @@ internal static class GridConfigurationExtensions
             {
                 Label = editorConfig.GetBlockname(),
                 ContentElementTypeKey = elementKey,
+                SettingsElementTypeKey = settingKey,
                 GroupKey = groupKey != Guid.Empty ? groupKey.ToString() : null,
                 BackgroundColor = Grid.GridBlocks.Background,
                 IconColor = Grid.GridBlocks.Icon
