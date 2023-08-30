@@ -1,8 +1,4 @@
 ﻿using System.Data;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
-using Lucene.Net.Util;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json.Linq;
@@ -10,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 using uSync.Migrations.Context;
+using uSync.Migrations.Extensions;
 using uSync.Migrations.Migrators.BlockGrid.Extensions;
 using uSync.Migrations.Migrators.BlockGrid.Models;
 using uSync.Migrations.Models;
@@ -130,7 +127,7 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
 
     Guid? settingKey = null;
     if ( configRowProperties.Count > 0 ) {
-      string friendlyAlias = GetFriendlyUrl( dataTypeAlias ) + "RowSettings";
+      string friendlyAlias = dataTypeAlias.ConvertToAlias() + "RowSettings";
       settingKey = context.GetContentTypeKeyOrDefault( friendlyAlias, friendlyAlias.ToGuid() );
       context.ContentTypes.AddNewContentType( new() {
         Key = (Guid)settingKey,
@@ -160,7 +157,7 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
 
         if ( gridArea.Grid == gridBlockContext.GridColumns ) {
           gridBlockContext.AppendToRootLayouts( allowed );
-          continue; //TODO: Why did someone not want us to go further??? If continue is on here no AllowedEditors will ever be set
+          //continue; //TODO: Why did someone not want us to go further??? If continue is on here no AllowedEditors will ever be set
         }
 
         var area = new BlockGridConfiguration.BlockGridAreaConfiguration {
@@ -244,40 +241,5 @@ internal class GridToBlockGridConfigLayoutBlockHelper {
 
       context.ContentTypes.AddElementType( block.ContentElementTypeKey );
     }
-  }
-
-  private static string RemoveAccent( string text ) {
-    string normalizedString = text.Normalize( NormalizationForm.FormD );
-    StringBuilder stringBuilder = new();
-
-    foreach ( char c in normalizedString ) {
-      UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory( c );
-      if ( unicodeCategory != UnicodeCategory.NonSpacingMark ) {
-        stringBuilder.Append( c );
-      }
-    }
-
-    return stringBuilder.ToString().Normalize( NormalizationForm.FormC );
-  }
-
-  private static string GetFriendlyUrl( string url ) {
-    if ( string.IsNullOrWhiteSpace( url ) ) {
-      return "";
-    }
-
-    url = url.ToLowerInvariant();
-    url = url.Replace( "æ", "ae" );
-    url = url.Replace( "ø", "oe" );
-    url = url.Replace( "å", "aa" );
-    url = RemoveAccent( url );
-    url = Regex.Replace( url, @"[^a-z0-9\s-/]", "" ); // Remove all non valid chars          
-    url = Regex.Replace( url, @"\s+", " " ).Trim(); // convert multiple spaces into one space  
-    url = Regex.Replace( url, @"\s", "-" ); // //Replace spaces by dashes
-
-    while ( url.Contains( "--" ) ) {
-      url = url.Replace( "--", "-" );
-    }
-
-    return url;
   }
 }

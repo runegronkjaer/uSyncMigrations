@@ -62,7 +62,7 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
         }
       } else {
         context.ContentTypes.AddProperty( contentTypeAlias, alias,
-            editorAlias, context.DataTypes.GetByDefinition( definition )?.EditorAlias );
+            editorAlias, context.DataTypes.GetByDefinition( definition )?.EditorAlias, definition );
 
         context.ContentTypes.AddDataTypeAlias( contentTypeAlias, alias,
             context.DataTypes.GetAlias( definition ) );

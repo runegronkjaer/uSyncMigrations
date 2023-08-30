@@ -17,9 +17,6 @@ using Newtonsoft.Json.Linq;
 using static Umbraco.Cms.Core.PropertyEditors.ListViewConfiguration;
 using Umbraco.Extensions;
 using uSync.Migrations.Models;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using System.Text;
 using Lucene.Net.Util;
 
 namespace uSync.Migrations.Migrators.BlockGrid;
@@ -86,18 +83,19 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
       foreach ( JToken property in configSettings ) {
         string? label = property.Value<string>( "label" );
         if ( !string.IsNullOrEmpty( label ) ) {
+          string? key = property.Value<string>( "key" );
           string? view = property.Value<string>( "view" );
-          if ( string.IsNullOrEmpty( view ) ) {
+          if ( string.IsNullOrEmpty( key ) || string.IsNullOrEmpty( view ) ) {
             continue;
           }
 
           Guid? dataTypeGuid = null;
-          if ( view.Contains( "margin", StringComparison.InvariantCultureIgnoreCase ) ) {
-            dataTypeGuid = new Guid( "85ac9fd1-b825-4723-9044-77262626be01" );
-          } else if ( view.Contains( "padding", StringComparison.InvariantCultureIgnoreCase ) ) {
+          if ( view.Contains( "padding", StringComparison.InvariantCultureIgnoreCase ) ) {
             dataTypeGuid = new Guid( "dee9ba01-a0b3-43d7-8c38-56b345d5939c" );
+          } else if ( view.Contains( "margin", StringComparison.InvariantCultureIgnoreCase ) ) {
+            dataTypeGuid = new Guid( "85ac9fd1-b825-4723-9044-77262626be01" );
           } else if ( view.Contains( "colorpicker", StringComparison.InvariantCultureIgnoreCase ) ) {
-            dataTypeGuid = new Guid( "57fe41a1-1c5b-490f-88a7-b904c70a7d38" );
+            dataTypeGuid = new Guid( "00E131A6-C1F4-47E6-96A4-863633768BF4" );
           } else if ( view.Contains( "textstring", StringComparison.InvariantCultureIgnoreCase ) ) {
             dataTypeGuid = new Guid( "0cc0eba1-9960-42c9-bf9b-60e150b429ae" );
           } else if ( view.Contains( "imagepicker", StringComparison.InvariantCultureIgnoreCase ) ) {
@@ -110,7 +108,7 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
 
           NewContentTypeProperty newContentTypeProperty = new() {
             Name = label,
-            Alias = GetFriendlyUrl( label ),
+            Alias = key,
             Description = property.Value<string>( "description" ) ?? "",
             DataTypeGuid = (Guid)dataTypeGuid
           };
@@ -134,7 +132,7 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
     // finding settingKey for cell settings
     Guid? settingKey = null;
     if ( configCellProperties.Count > 0 ) {
-      string friendlyAlias = GetFriendlyUrl( dataTypeProperty.DataTypeAlias ) + "CellSettings";
+      string friendlyAlias = dataTypeProperty.DataTypeAlias.ConvertToAlias() + "CellSettings";
       settingKey = context.GetContentTypeKeyOrDefault( friendlyAlias, friendlyAlias.ToGuid() );
       context.ContentTypes.AddNewContentType( new() {
         Key = (Guid)settingKey,
@@ -182,47 +180,14 @@ public class Gridv7ToBlockGridMigrator : SyncPropertyMigratorBase {
     var helper = new GridToBlockContentHelper( _conventions, _blockMigrators,
       _loggerFactory.CreateLogger<GridToBlockContentHelper>(), _contentTypeService );
 
-    var blockValue = helper.ConvertToBlockValue( source, context );
+    var editorAliasInfo = context.ContentTypes.GetEditorAliasByTypeAndProperty( contentProperty.ContentTypeAlias, contentProperty.PropertyAlias );
+
+    var blockValue = helper.ConvertToBlockValue( source, context, editorAliasInfo );
     if ( blockValue == null ) {
       _logger.LogDebug( "Converted value for {alias} is empty", contentProperty.EditorAlias );
       return string.Empty;
     }
 
     return JsonConvert.SerializeObject( blockValue, Formatting.Indented );
-  }
-
-  private static string RemoveAccent( string text ) {
-    string normalizedString = text.Normalize( NormalizationForm.FormD );
-    StringBuilder stringBuilder = new();
-
-    foreach ( char c in normalizedString ) {
-      UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory( c );
-      if ( unicodeCategory != UnicodeCategory.NonSpacingMark ) {
-        stringBuilder.Append( c );
-      }
-    }
-
-    return stringBuilder.ToString().Normalize( NormalizationForm.FormC );
-  }
-
-  private static string GetFriendlyUrl( string url ) {
-    if ( string.IsNullOrWhiteSpace( url ) ) {
-      return "";
-    }
-
-    url = url.ToLowerInvariant();
-    url = url.Replace( "æ", "ae" );
-    url = url.Replace( "ø", "oe" );
-    url = url.Replace( "å", "aa" );
-    url = RemoveAccent( url );
-    url = Regex.Replace( url, @"[^a-z0-9\s-/]", "" ); // Remove all non valid chars          
-    url = Regex.Replace( url, @"\s+", " " ).Trim(); // convert multiple spaces into one space  
-    url = Regex.Replace( url, @"\s", "-" ); // //Replace spaces by dashes
-
-    while ( url.Contains( "--" ) ) {
-      url = url.Replace( "--", "-" );
-    }
-
-    return url;
   }
 }

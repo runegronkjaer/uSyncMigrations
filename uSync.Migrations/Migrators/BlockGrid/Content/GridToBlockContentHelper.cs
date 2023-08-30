@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using J2N.Text;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 using uSync.Migrations.Context;
+using uSync.Migrations.Extensions;
 using uSync.Migrations.Migrators.BlockGrid.BlockMigrators;
 using uSync.Migrations.Migrators.BlockGrid.Extensions;
 using uSync.Migrations.Migrators.BlockGrid.Models;
@@ -41,7 +43,7 @@ internal class GridToBlockContentHelper {
   /// <summary>
   ///  convert a grid value (so with sections, rows, areas and controls) into a block value for a grid.
   /// </summary>
-  public BlockValue? ConvertToBlockValue( GridValue source, SyncMigrationContext context ) {
+  public BlockValue? ConvertToBlockValue( GridValue source, SyncMigrationContext context, EditorAliasInfo editorAliasInfo ) {
     // empty grid check
     if ( source.Sections.Any() != true ) return null;
 
@@ -79,16 +81,16 @@ internal class GridToBlockContentHelper {
           var layouts = GetGridAreaBlockLayouts( area.value, contentAndSettings ).ToList();
           if ( !layouts.Any() ) continue;
 
-          if ( areaIsFullWidth ) {
-            blockLayouts.AddRange( layouts );
-          } else {
-            var areaItem = new BlockGridLayoutAreaItem {
-              Key = _conventions.LayoutAreaAlias( row.Name, _conventions.AreaAlias( area.index ) ).ToGuid(),
-              Items = layouts.ToArray()
-            };
+          //if ( areaIsFullWidth ) {
+          //  blockLayouts.AddRange( layouts );
+          //} else {
+          var areaItem = new BlockGridLayoutAreaItem {
+            Key = _conventions.LayoutAreaAlias( row.Name, _conventions.AreaAlias( area.index ) ).ToGuid(),
+            Items = layouts.ToArray()
+          };
 
-            rowLayoutAreas.Add( areaItem );
-          }
+          rowLayoutAreas.Add( areaItem );
+          //}
 
           // add the content and settings to the block. 
           contentAndSettings.ForEach( x => {
@@ -105,7 +107,59 @@ internal class GridToBlockContentHelper {
         var rowContent = GetGridRowBlockContent( row, context );
 
         block.ContentData.Add( rowContent );
-        blockLayouts.Add( GetGridRowBlockLayout( rowContent, rowLayoutAreas, rowColumns ) );
+
+        Udi? settingsUdi = null;
+        if ( row.Config != null && editorAliasInfo.DataTypeDefinition != null ) {
+          var dataTypeInfo = context.DataTypes.GetByDefinition( (Guid)editorAliasInfo.DataTypeDefinition );
+          var config = JsonConvert.DeserializeObject<Dictionary<string, object?>>( row.Config.ToString() );
+
+          if ( config != null && !string.IsNullOrEmpty( dataTypeInfo?.DataTypeName ) ) {
+            var rowLayoutContentTypeAlias = dataTypeInfo.DataTypeName.ConvertToAlias() + "RowSettings";
+            var rowContentTypeKey = context.GetContentTypeKeyOrDefault( rowLayoutContentTypeAlias, rowLayoutContentTypeAlias.ToGuid() );
+
+            if ( config.TryGetValue( "background", out object? backgroundValue ) ) {
+              int val = Convert.ToInt32( backgroundValue );
+
+              if ( val > 0 ) {
+                config["background"] = val - 1;
+              }
+            }
+
+            if ( config.TryGetValue( "color", out object? colorValue ) ) {
+              int val = Convert.ToInt32( colorValue );
+
+              if ( val > 0 ) {
+                config["color"] = val - 1;
+              }
+            }
+
+            var marginAndPadding = config.Where( c => c.Key.Contains( "class", StringComparison.InvariantCultureIgnoreCase ) );
+            if ( marginAndPadding != null ) {
+              foreach ( KeyValuePair<string, object?> entry in marginAndPadding ) {
+                if ( entry.Value == null || string.IsNullOrEmpty( entry.Value.ToString() ) ) {
+                  continue;
+                }
+
+                string oldVal = entry.Value.ToString();
+                if ( oldVal.Contains( "margin", StringComparison.InvariantCultureIgnoreCase ) ) {
+                  config[entry.Key] = ConvertConfigMarginToString( oldVal );
+                } else if ( oldVal.Contains( "padding", StringComparison.InvariantCultureIgnoreCase ) ) {
+                  config[entry.Key] = ConvertConfigPaddingToString( oldVal );
+                }
+              }
+            }
+
+            settingsUdi = Udi.Create( UmbConstants.UdiEntityType.Element, Guid.NewGuid() );
+            block.SettingsData.Add( new() {
+              Udi = settingsUdi,
+              ContentTypeKey = rowContentTypeKey,
+              ContentTypeAlias = rowLayoutContentTypeAlias,
+              RawPropertyValues = config
+            } );
+          }
+        }
+
+        blockLayouts.Add( GetGridRowBlockLayout( rowContent, rowLayoutAreas, rowColumns, settingsUdi ) );
       }
 
       // section 
@@ -118,6 +172,36 @@ internal class GridToBlockContentHelper {
         };
 
     return block;
+  }
+
+  private string ConvertConfigMarginToString( string oldVal ) {
+    var value = oldVal.Split( "__" ).TrimEnd()?.Last();
+
+    if ( string.IsNullOrEmpty( value ) )
+      return oldVal;
+
+    return value.ToLower() switch {
+      "none" => "Ingen",
+      "small" => "Mindre",
+      "normal" => "Normal (default)",
+      "medium" => "Mere",
+      _ => oldVal,
+    };
+  }
+
+  private string ConvertConfigPaddingToString( string oldVal ) {
+    var value = oldVal.Split( "__" ).TrimEnd()?.Last();
+
+    if ( string.IsNullOrEmpty( value ) )
+      return oldVal;
+
+    return value.ToLower() switch {
+      "none" => "Ingen (default)",
+      "small" => "Mindre",
+      "normal" => "Normal",
+      "medium" => "Mere",
+      _ => oldVal,
+    };
   }
 
   private IEnumerable<BlockContentPair> GetGridAreaBlockContent( GridValue.GridArea area, SyncMigrationContext context ) {
@@ -156,9 +240,10 @@ internal class GridToBlockContentHelper {
     };
   }
 
-  private BlockGridLayoutItem GetGridRowBlockLayout( BlockItemData rowContent, List<BlockGridLayoutAreaItem> rowLayoutAreas, int? rowColumns ) {
+  private BlockGridLayoutItem GetGridRowBlockLayout( BlockItemData rowContent, List<BlockGridLayoutAreaItem> rowLayoutAreas, int? rowColumns, Udi? settingsUdi ) {
     return new BlockGridLayoutItem {
       ContentUdi = rowContent.Udi,
+      SettingsUdi = settingsUdi,
       Areas = rowLayoutAreas.ToArray(),
       ColumnSpan = rowColumns,
       RowSpan = 1,

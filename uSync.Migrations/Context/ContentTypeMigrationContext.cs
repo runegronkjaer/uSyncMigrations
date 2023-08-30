@@ -102,7 +102,7 @@ public class ContentTypeMigrationContext {
 
     if ( !string.IsNullOrEmpty( newAlias ) && !string.IsNullOrEmpty( originalAlias ) ) {
       _ = _propertyTypesByNewEditorAlias.TryAdd( newAlias,
-        new EditorAliasInfo( originalAlias, newAlias ) );
+        new EditorAliasInfo( originalAlias, newAlias, dataTypeDefinition ) );
     }
   }
 
