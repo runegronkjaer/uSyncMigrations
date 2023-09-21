@@ -3,8 +3,7 @@
     "name": "Rich text editor",
     "alias": "rte",
     "view": "rte",
-    "icon": "icon-article",
-    "render": "/Views/Partials/Grid/editors/NovicellEditors/rte.cshtml"
+    "icon": "icon-article"
   },
   {
     "name": "Image",
